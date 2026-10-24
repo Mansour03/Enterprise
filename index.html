@@ -1740,31 +1740,75 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 
 <h2 id="purchase-extensions">Extensions بتشتريها لوحدها</h2>
 
-<h3>Data Interoperability</h3>
-<p>بيشارك أدوات بتتعامل مع <strong>صيغ ونماذج داتا كتير</strong>. فيه أدوات <strong>Spatial ETL بدون كود</strong>، وتكاملات ومزامنات آمنة، ونشر workflows متجدولة أو بتتفعل بـ webhook.</p>
+<h3>Data Interoperability (التشغيل البيني للبيانات)</h3>
+<p>بيشارك خدمات بتتعامل مع <strong>صيغ ونماذج داتا كتير</strong>. حسب الصفحة:</p>
+<ul>
+<li>نقل الداتا بين ArcGIS والأنظمة التانية.</li>
+<li>تأليف أدوات <strong>Spatial ETL</strong> (Extract, Transform, Load: استخراج وتحويل وتحميل) بدون كود في ArcGIS Pro.</li>
+<li>عمل تكاملات ومزامنات آمنة، بما فيها الأنظمة cloud-native.</li>
+<li>نشر أدوات الـ ETL على ArcGIS Enterprise لـ workflows متجدولة أو بتتفعل بـ <strong>webhook</strong> (رابط HTTP بيتنادى من نظام تاني فيبدأ التنفيذ).</li>
+</ul>
 <div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): CAD → GIS كخدمة</div>
 <p>قسم التصميم بيسلّم ملفات DWG أسبوعيًا، وأنت بتحوّلها لـ feature classes وتدخلها الـ geodatabase يدويًا بسكربت. بـ Data Interoperability تبني الـ ETL مرة وتنشره كـ geoprocessing service، والفريق بيرفع الـ DWG ويطلعله النتيجة بدون ما يعتمد عليك. ده يوفر ساعات كل أسبوع.</p></div>
 
-<h3>Data Reviewer</h3>
-<p>بيوفر workflows لجودة الداتا عن طريق web وmobile apps، وبيعلّم تلقائيًا الداتا اللي بتفشل في متطلبات الجودة، وبيعمل تقارير جودة عبر المنصات. ده امتداد طبيعي لشغل قسم الـ QC: checks آلية قبل أي تسليم.</p>
+<h3>Data Reviewer (مراجع جودة البيانات)</h3>
+<p>بيوفر workflows لجودة الداتا عن طريق web وmobile apps. حسب صفحة Esri بيعمل التالي:</p>
+<ul>
+<li>يستخدم web services لعمل <strong>quality control</strong> على مستوى المؤسسة كلها.</li>
+<li>يكتشف تلقائيًا الداتا غير المطابقة للمتطلبات (non-compliant data).</li>
+<li>يتتبّع جودة الداتا ويعمل تقارير عنها عبر المنصات المختلفة.</li>
+</ul>
+<p>ده امتداد طبيعي لشغل قسم الـ QC: checks آلية قبل أي تسليم.</p>
 
-<h3>Roads and Highways</h3>
-<p>بيضيف قدرات <strong>linear referencing REST</strong> لشبكات الطرق (Roads and Highways LRS): نشر الـ LRS networks والـ events، تحديد المسارات والـ measures (locate)، التحقق من القيم (validate)، تحويل الـ measures بين الطرق (convert)، واستخدام widgets الـ LRS في Experience Builder.</p>
+<h3>Roads and Highways (الطرق السريعة)</h3>
+<p>بيوسّع الـ map services بقدرات <strong>linear referencing</strong> (التسكين الخطي: تحديد موقع بقيمة قياس على طول مسار بدل إحداثيات X,Y) عن طريق REST. حسب الصفحة:</p>
+<ul>
+<li>نشر شبكات الـ <strong>LRS</strong> (Linear Referencing System, نظام التسكين الخطي) وطبقات الأحداث (event layers).</li>
+<li>تحديد المسارات والـ measures (locate routes and measures).</li>
+<li>التحقق من صحة الـ measures (validate).</li>
+<li>التحويل بين طرق التسكين الخطي <strong>LRM</strong> (Linear Referencing Method).</li>
+<li>الاستخدام مع widgets الـ LRS في Experience Builder.</li>
+</ul>
 
-<h3>Pipeline Referencing</h3>
-<p>نفس فكرة linear referencing REST لكن لشبكات خطوط الأنابيب: نشر LRS networks وevents، locate routes وmeasures، validate، convert، وwidgets Experience Builder.</p>
+<h3>Pipeline Referencing (مرجعية خطوط الأنابيب)</h3>
+<p>نفس القدرات تمامًا لكن موجهة لمؤسسات خطوط الأنابيب (pipeline organizations): نشر LRS networks وevent layers، locate routes وmeasures، validate measures، التحويل بين LRMs، واستخدام widgets الـ LRS في Experience Builder.</p>
 
-<h3>Maritime</h3>
-<p>بينشر مجموعات بيانات الخرائط البحرية <strong>S-57 وS-63</strong> كـ RESTful وOGC WMS services، وبيدعم common operating pictures وCustom Chart Builder لإنتاج خرائط الملاحة. <strong>ملحوظة:</strong> الـ Custom Chart Builder <strong>مش متاح على Linux</strong>. على Windows ما فيش القيد ده.</p>
+<h3>Maritime (الخرائط البحرية)</h3>
+<p>بيتيح مجموعات بيانات الخرائط الملاحية <strong>S-57 وS-63</strong> كـ web services للتحليل والوعي بالموقف (situational awareness) وإنتاج الخرائط. حسب الصفحة:</p>
+<ul>
+<li>تطبيق مواصفات منتجات <strong>IHO S-57</strong> (International Hydrographic Organization, المنظمة الهيدروغرافية الدولية) مثل AML وENC وIENC وBIENC.</li>
+<li>استخدام <strong>Maritime Chart Service</strong> عن طريق RESTful وOGC WMS (Web Map Service).</li>
+<li>دعم الـ common operating pictures (الصورة التشغيلية المشتركة).</li>
+<li>نشر <strong>Custom Chart Builder</strong>.</li>
+<li>استخدام بيانات S-57/S-63 في أعمال المساحة (survey) والساحل (coastline) والهندسة.</li>
+<li>بيشتغل مع ArcGIS Maritime وArcGIS Bathymetry في ArcGIS Pro.</li>
+</ul>
+<div class="callout warn"><div class="callout-title">ملحوظة من Esri</div><p>الـ Custom Chart Builder <strong>مش متاح على Linux</strong>. على Windows ما فيش القيد ده.</p></div>
 
-<h3>Aviation Airports</h3>
-<p>بيشارك خرائط وgeoprocessing services مبنية على المطارات. بيعمل Obstacle Identification Surfaces كخرائط 2D أو مشاهد 3D وبينشر أدوات obstacle-intersection.</p>
+<h3>Aviation Airports (مطارات الطيران)</h3>
+<p>بيشارك خرائط وgeoprocessing services مبنية على بيانات المطار (airfield data):</p>
+<ul>
+<li>إنشاء ومشاركة <strong>OIS</strong> (Obstacle Identification Surfaces, أسطح تحديد العوائق) كخرائط 2D أو مشاهد 3D.</li>
+<li>نشر أدوات بتقيّم تقاطع العوائق مع features الـ OIS.</li>
+</ul>
 
-<h3>Aviation Charting</h3>
-<p>بيتبادل بيانات الملاحة <strong>AIXM 5.1</strong>، وبيستورد بيانات العوائق الرقمية من FAA، وبينشر أدوات لأتمتة إنتاج الخرائط الملاحية.</p>
+<h3>Aviation Charting (الخرائط الملاحية الجوية)</h3>
+<p>بيشارك خرائط وgeoprocessing services مبنية على بيانات الطيران:</p>
+<ul>
+<li>تبادل رسائل <strong>AIXM 5.1</strong> (Aeronautical Information Exchange Model, نموذج تبادل المعلومات الملاحية).</li>
+<li>استيراد بيانات العوائق الرقمية <strong>DOF</strong> (Digital Obstacle File) من FAA (Federal Aviation Administration, هيئة الطيران الفيدرالية الأمريكية).</li>
+<li>نشر أدوات لأتمتة إنتاج الخرائط الملاحية (chart production).</li>
+</ul>
 
-<h3>Topographic Mapping</h3>
-<p>بيركّز القواعد الكارتوجرافية والـ templates والـ workflows لإنتاج الخرائط الطبوغرافية بنظام self-service، وفيه web apps لمنتجات الخرائط وjobs الـ workflow. <strong>مش متاح للشراء على Standard</strong>؛ متاح للشراء على Advanced فقط.</p>
+<h3>Topographic Mapping (الخرائط الطبوغرافية)</h3>
+<p>بيركّز business rules وworkflows وmap documents لإنتاج الخرائط الطبوغرافية بنظام self-service:</p>
+<ul>
+<li>إنتاج كارتوجرافي موحّد قائم على قاعدة البيانات (standardized database-driven).</li>
+<li>self-service mapping بقواعد وtemplates وworkflows.</li>
+<li>خرائط مطابقة لمعايير الدفاع (defense-standard fit-for-use).</li>
+<li>بيشتغل مع ArcGIS Pro، وبيوفر web apps لمنتجات الخرائط وjobs الـ workflow.</li>
+</ul>
+<p><strong>مش متاح للشراء على Standard</strong>؛ متاح للشراء على Advanced فقط.</p>
 
 <h3>Workflow Manager Server</h3>
 <p>بيظهر في الجدول كـ extension للشراء على Standard وAdvanced، وهو نفسه بيتتركّب كـ server (راجع <a data-go="additional-servers" href="#">Additional servers</a>).</p>
@@ -1842,6 +1886,681 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <li>Spatial Analyst وGeostatistical وSharing 3D مدمجة في Advanced فقط، وNetwork Analyst مدمج في Advanced ومشترى على Standard.</li>
 <li>Data Reviewer وData Interoperability وRoads and Highways وPipeline Referencing وMaritime وAviation بتتشترى لوحدها، وTopographic Mapping متاح للشراء على Advanced بس.</li>
 <li>Custom Chart Builder بتاع Maritime مش متاح على Linux.</li>
+</ul>
+</section>
+<section class="topic" id="t-system-requirements" hidden><div class="eyebrow">System requirements and ports</div><h1>ArcGIS Enterprise system requirements</h1><p class="subtitle">متطلبات النظام: الأجهزة والـ OS والمتصفحات</p><p class="lead">قبل ما تطلب VM من فريق الـ IT أو تفتح الـ installer، لازم تعرف <strong>الجهاز لازم يكون عامل إزاي</strong>. صفحة Esri "ArcGIS Enterprise 12.1 system requirements" (متطلبات النظام) بتجمع كل الحدود الدنيا: نظام التشغيل، الذاكرة (RAM)، المساحة، الـ file systems، المتصفحات، الـ DNS، والشهادات. الصفحة دي شرح كامل ليها، بتشرح <strong>ليه</strong> كل متطلب موجود وإيه اللي بيحصل لو اتجاهلته، وبتقفل بالـ 5 محاور ورقة مراجعة قبل التركيب. ولو مصطلح زي FQDN أو IIS أو RAM مش واضح، افتح <a data-go="glossary" href="#">قاموس المصطلحات</a>.</p>
+
+<div class="callout warn"><div class="callout-title">قاعدة أولى من Esri</div>
+<p>لازم تستخدم <strong>نفس رقم الإصدار (version)</strong> لكل مكونات الـ deployment (Portal وServer وData Store وWeb Adaptor). وبرنامج التركيب بيشغّل <strong>أداة تشخيص (diagnostics tool)</strong> بتفحص الجهاز وتقولك لو مش مطابق للحد الأدنى قبل ما تكمّل. والصفحة <em>ما بتدّيش</em> أرقام hardware لحجم الـ production: بتقول إن الاحتياج بيتوقف على المستخدمين والـ workloads (أحمال الشغل).</p></div>
+
+<h2 id="windows-os">نظام التشغيل على Windows</h2>
+<p><strong>Why:</strong> كل مكون من Enterprise بيشتغل كـ Windows Service، وبيعتمد على مكتبات النظام وعلى IIS. الإصدارات غير المدعومة معناها إن Esri ما اختبرتهاش، فلو حصلت مشكلة مش هتلاقي دعم.</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>المتطلب (من الصفحة الرسمية)</th><th>معناه عمليًا</th></tr></thead>
+<tbody>
+<tr><td>للـ production</td><td>Windows Server 2025 و2022 و2019 (إصدارات Standard وDatacenter)، 64-bit، مع تحديثات أبريل 2026</td><td>اطلب من الـ IT واحد من التلاتة دول. Standard كفاية، مفيش حاجة تخليك تحتاج Datacenter.</td></tr>
+<tr><td>للاختبار وتطوير التطبيقات فقط</td><td>Windows 11 Pro وEnterprise</td><td>تقدر تجرب على جهازك، لكن مش للإنتاج.</td></tr>
+<tr><td>Desktop Experience</td><td>مطلوبة على كل إصدارات Windows Server</td><td>يعني النسخة اللي فيها الواجهة الرسومية (مش Server Core). الـ installers والـ wizards محتاجين GUI.</td></tr>
+<tr><td>طول المسار (File path)</td><td>أقصى 260 حرف</td><td>ما تحطش مجلد التركيب أو الـ directories في مسار طويل ومتداخل.</td></tr>
+<tr><td>IPv6</td><td>ما تعطّلوش</td><td>IPv6 هو الجيل الأحدث من عناوين الشبكة. لو الشركة عطّلته لازم تتبع تعليمات Microsoft بدل ما تعطله كاملاً.</td></tr>
+<tr><td>Domain controllers</td><td>ما تركّبش عليها</td><td>الـ domain controller هو السيرفر اللي بيدير حسابات الشركة (Active Directory). تركيب Enterprise عليه خطر أمني وغير مدعوم.</td></tr>
+<tr><td>اسم الجهاز</td><td>ممنوع الـ underscore (_)</td><td>اسم زي <code>GIS_SRV01</code> هيفشل في التركيب. استخدم شرطة عادية <code>GIS-SRV01</code>.</td></tr>
+<tr><td>Visual C++ 2015-2022 Redistributable (x64)</td><td>إصدار 14.44.35211 أو أحدث</td><td>مكتبات من Microsoft لازم تتركّب. <code>setup.exe</code> بيركّبها لو ناقصة، لكن لو شغّلت <code>setup.msi</code> مباشرة مش هيركّبها والتركيب هيفشل.</td></tr>
+</tbody></table></div>
+<div class="callout real"><div class="callout-title">مثال: اسم الجهاز بالـ underscore</div>
+<p>فريق الـ IT سمّى الـ VM باسم <code>ARCGIS_PROD1</code> حسب معيار الشركة. التركيب وقف برسالة رفض. الحل اتطلب إعادة تسمية الجهاز وإعادة انضمامه للدومين، يعني ساعات ضايعة. سؤال واحد قبل ما يتسمى الجهاز كان يوفر ده.</p></div>
+
+<h2 id="linux-os">نظام التشغيل على Linux (للمعرفة)</h2>
+<p>دليلنا على Windows، لكن لو الـ client بيستخدم Linux هتحتاج تعرف اللي الصفحة بتقوله: بتدعم RHEL 8 و9، وAlmaLinux 8 و9، وRocky Linux 8 و9، وOracle Linux 8 و9، وSUSE Linux Enterprise Server 15، وUbuntu Server 22.04 و24.04. التركيب بحساب root ممنوع. و<code>/tmp</code> هو مجلد الملفات المؤقتة الافتراضي. وفيه حدود لعدد الملفات المفتوحة (file handles: 65,535) وعدد العمليات (processes: 25,059) لازم تتظبط. الـ Linux مش مدعوم لـ ArcGIS Video Server. وأي نظام تشغيل معدّل (modified binaries) غير مدعوم.</p>
+
+<h2 id="server-reqs">متطلبات ArcGIS Server</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>القيمة</th><th>الشرح</th></tr></thead>
+<tbody>
+<tr><td>المساحة (Disk)</td><td>10 GB متاحة كحد أدنى (حوالي 1.5 GB مؤقتة أثناء التركيب)</td><td>ده التركيب نفسه فقط. الـ config-store والـ directories والـ caches بتحتاج مساحة إضافية بحسب الاستخدام (راجع صفحات التخزين).</td></tr>
+<tr><td>الذاكرة (RAM)</td><td>8 GB كحد أدنى لكل machine</td><td>كل service instance (عملية ArcSOC.exe) بتاكل ذاكرة. 8 GB هو أرضية التشغيل مش حجم الإنتاج.</td></tr>
+<tr><td>التركيب على NFS</td><td>غير مدعوم</td><td>NFS نظام ملفات شبكي ينتشر على Linux. مجلد التركيب لازم يكون على قرص محلي.</td></tr>
+<tr><td>.NET SOEs/SOIs</td><td>محتاج .NET 10 (Desktop Runtime 10 x64 أو SDK 10 x64) قبل ArcGIS Server</td><td>SOE = Server Object Extension وSOI = Server Object Interceptor: إضافات برمجية للسيرفر مكتوبة بـ .NET. من غير .NET 10 الميزة دي مش هتشتغل.</td></tr>
+<tr><td>Page file</td><td>حجم مناسب</td><td>Page file هو "ذاكرة احتياطية على القرص" Windows بيستخدمها لما RAM يخلص. تركه صغير جدًا بيسبب أعطال تحت الحمل.</td></tr>
+<tr><td>صلاحيات المجموعة والكل</td><td>Read وWrite وRun بتاعة group وall users مقفولة افتراضيًا</td><td>يعني ملفات التركيب مقفولة على الحساب اللي ركّبها. حط بالك لما تغير حساب الخدمة.</td></tr>
+<tr><td>ArcPy</td><td>بيستخدم Python 3</td><td>الـ geoprocessing services بتشتغل بالـ Python 3 اللي جاي مع التركيب.</td></tr>
+</tbody></table></div>
+<div class="callout tip"><div class="callout-title">جسر من عالم ArcGIS Pro</div>
+<p>الـ Pro على جهازك بيستخدم الـ RAM الخاص بيك لخريطة واحدة. السيرفر بيشغّل <strong>عدة services في نفس الوقت</strong>، كل service بنسخ (instances) متعددة، وكل نسخة عملية <code>ArcSOC.exe</code> مستقلة بتاكل ذاكرة. فلو 20 service × 2 instance = 40 عملية بتتحمل على الجهاز. علشان كده 8 GB هو الحد الأدنى جدًا.</p></div>
+
+<h2 id="portal-reqs">متطلبات Portal for ArcGIS</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>القيمة</th><th>الشرح</th></tr></thead>
+<tbody>
+<tr><td>CPU (المعالج)</td><td>2 cores للتطوير والاختبار، و<strong>4 cores كحد أدنى (مُوصى بيه بشدة) للإنتاج</strong></td><td>Core = نواة معالجة. الـ Portal بتعالج طلبات كتير متزامنة (login، بحث، عرض items)، فالـ 2 cores مش مناسبين للإنتاج.</td></tr>
+<tr><td>الذاكرة</td><td>8 GB</td><td>الـ Portal بيشغّل قاعدة بيانات داخلية وفهرس بحث.</td></tr>
+<tr><td>المساحة</td><td>30 GB + مساحة لمحتوى المستخدمين</td><td>الـ content directory بيخزن كل الملفات المرفوعة. ممكن تنقله بعد التركيب.</td></tr>
+<tr><td>File systems على Linux</td><td>ext3 يحدّ الـ portal بأقل من 32,000 item. استخدم ext4 أو xfs. btrfs مدعوم بشرط مساحة كافية للـ metadata</td><td>معلومة مهمة لو الـ client على Linux: نوع الـ file system بيحدد أقصى عدد items.</td></tr>
+<tr><td>File handles</td><td>65,535 كحد أدنى على Linux</td><td>أداة التشخيص بتفحصه.</td></tr>
+</tbody></table></div>
+<div class="callout real"><div class="callout-title">مثال: الـ content directory بيكبر</div>
+<p>جهة بدأت بـ 30 مستخدم وبعد سنتين بقى عندها 400 مستخدم وآلاف الـ items وملفات PDF وصور. الـ content directory كان على <code>C:</code> وامتلى. النظام وقف. الحل كان نقل الـ content directory لمكان تاني (Esri بتقول ينفع بعد التركيب) بأداة مخصصة. لو كان اتحط من الأول على volume مخصص كان وفر الوقت.</p></div>
+
+<h2 id="datastore-reqs">متطلبات ArcGIS Data Store</h2>
+<p><strong>Why:</strong> الـ Data Store هو أكتر مكون بيتأثر بنقص الموارد. الصفحة بتحذر: نقص الموارد ممكن يخلّي الـ data store <em>غير صالح للتشغيل (inoperable)</em>.</p>
+<h3>المساحة</h3>
+<ul>
+<li>الحد الأدنى على system drive: <strong>13 GB</strong> لكل الأنواع ما عدا object store، و<strong>27 GB</strong> للـ object store.</li>
+<li>حجم الـ store وهو فاضي: spatiotemporal big data store 200 MB، graph store 100 MB، object store 7 GB، relational store 2.5 GB (بيبدأ حوالي 200 MB وبيكبر حوالي 200 MB في الساعة لمدة 11 ساعة).</li>
+<li>الـ spatiotemporal محتاج 20% مساحة فاضية على الأقل وقت الإعداد أو الـ upgrade.</li>
+<li>الـ backups المخزنة محليًا بتاكل مساحة، فخزنها في مكان مشترك أو cloud storage.</li>
+</ul>
+<div class="callout danger"><div class="callout-title">عتبات التحذير (مهم جدًا للتشغيل)</div>
+<p>لو المساحة الفاضية نزلت عن <strong>10 GB</strong> بيتسجل تحذير. ولو نزلت عن <strong>5 GB</strong>: الـ relational وobject وspatiotemporal بيتحولوا لـ <strong>read-only</strong> (قراءة فقط) يعني المساحين ما يقدروش يرسلوا بيانات، والـ graph store بيتقفل. اضبط تنبيهات بالإيميل من Data Store، وراقب المساحة.</p></div>
+<h3>الذاكرة (RAM الفاضية قبل إعداد store فاضي، نوع واحد لكل جهاز)</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>نوع الـ store</th><th>أقل RAM فاضية</th></tr></thead>
+<tbody>
+<tr><td>Relational</td><td>8 GB</td></tr>
+<tr><td>Object</td><td>16 GB (32 GB مُوصى بيه للأداء)</td></tr>
+<tr><td>Spatiotemporal big data</td><td>16 GB</td></tr>
+<tr><td>Graph</td><td>32 GB</td></tr>
+</tbody></table></div>
+<p>الـ graph store محتاج معالج يدعم <strong>AVX2</strong> (مجموعة تعليمات متقدمة في المعالجات الحديثة). والـ relational store بيستخدم الـ locale بتاع النظام (اللغة والإعدادات الإقليمية) ومدعوم بس الـ locales اللي بتستخدم ASCII.</p>
+
+<h2 id="wa-reqs">متطلبات ArcGIS Web Adaptor</h2>
+<p><strong>Why:</strong> هو الباب الأمامي، وإلزامي للـ web-tier authentication زي IWA وLDAP basic وclient certificates. وممكن يشتغل ورا reverse proxy أو load balancer تاني.</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>القيمة</th></tr></thead>
+<tbody>
+<tr><td>على IIS (Windows فقط)</td><td>لازم تفعّل مكونات IIS المطلوبة الأول. ولازم Microsoft Web Deploy 4.0 و<strong>ASP.NET Core Runtime 10.x Windows Hosting Bundle</strong>. لو الـ Hosting Bundle اتركّب قبل تفعيل IIS، اعمله Repair.</td></tr>
+<tr><td>إصدارات IIS</td><td>بتتطابق مع إصدارات Windows المدعومة</td></tr>
+<tr><td>الذاكرة</td><td>8 GB كحد أدنى، وأكتر لو instances كتير أو طلبات كتيرة</td></tr>
+<tr><td>أقصى عدد instances من نفس الإصدار على جهاز واحد</td><td>51 لو الأول اتركّب بالـ setup، و50 لو بـ Enterprise Builder</td></tr>
+<tr><td>Java (بديل لـ IIS)</td><td>Apache Tomcat 10.1.x مع Java 11 أو أحدث، على Windows أو Linux</td></tr>
+</tbody></table></div>
+<div class="callout tip"><div class="callout-title">ما هو IIS؟</div>
+<p><strong>IIS = Internet Information Services (خدمات معلومات الإنترنت)</strong>: برنامج Microsoft المدمج في Windows Server اللي بيستضيف المواقع. الـ Web Adaptor بيتركّب جواه كـ web application. و<strong>Application Pool</strong> هو "غرفة معزولة" داخل IIS بيشتغل فيها الـ Web Adaptor بحساب خاص.</p></div>
+
+<h2 id="builder-reqs">متطلبات ArcGIS Enterprise Builder</h2>
+<p>Enterprise Builder بيركّب base deployment كامل على جهاز واحد (راجع <a data-go="single-machine" href="#">single machine</a>). متطلبات الـ Web Adaptor (IIS) لازم تتحقق قبله.</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>Windows</th></tr></thead>
+<tbody>
+<tr><td>المساحة على system drive (staging وlogs)</td><td>20 GB</td></tr>
+<tr><td>المساحة على drive التركيب</td><td>50 GB كحد أدنى (أغلب الناس تحتاج أكتر)</td></tr>
+<tr><td>للإنتاج</td><td>90 GB أو أكتر لكل جهاز</td></tr>
+<tr><td>الذاكرة</td><td>32 GB مُوصى بيها للتركيب. و<strong>48 GB</strong> لو هتنشر hosted scene layers أو hosted 3D tiles layers (ولازم تزوّد heap الـ object store لـ 16000 MB على الأقل بأداة <code>changedbproperties</code>)</td></tr>
+</tbody></table></div>
+<p>(على Linux: 52 GB فاضية للتركيب، و80 GB أو أكتر للإنتاج.)</p>
+
+<h2 id="browsers">المتصفحات</h2>
+<p>الإصدارات الأحدث مُوصى بيها دايمًا. المدعوم حسب الصفحة: Google Chrome 142 فأحدث، Microsoft Edge 142 فأحدث، Mozilla Firefox 146 فأحدث، Firefox 140 ESR، Safari 18 فأحدث. المتصفح لازم يكون <strong>64-bit ومفعّل فيه WebGL2</strong> ومفعّل الـ local storage. <strong>WebGL2</strong> هو تقنية بتخلي المتصفح يستخدم كرت الشاشة (GPU) لرسم الخرائط والـ 3D. و<strong>Local storage</strong> مساحة صغيرة في المتصفح بيخزن فيها التطبيق إعداداته. تفاصيل الـ 3D في <a data-go="scene-viewer" href="#">صفحة Scene Viewer</a>.</p>
+
+<h2 id="dns-https">DNS والشهادات والشبكة</h2>
+<div class="cards">
+<div class="card"><h4>FQDN في الـ DNS</h4><p>الاسم الكامل (Fully Qualified Domain Name) لجهاز الـ Portal لازم يكون مسجل في DNS. وأي federated server site كمان يبقى له اسم مسجل.</p></div>
+<div class="card"><h4>Organization URL واحد</h4><p>مدعوم URL واحد فقط للمؤسسة. اتفق عليه قبل التركيب.</p></div>
+<div class="card"><h4>الأسماء الودية (Friendly names)</h4><p>اضبطها قبل التركيب. لو غيرت الاسم بعدين ممكن items الموجودة تبقى غير صالحة وتضطر تعيد إنشاءها.</p></div>
+<div class="card"><h4>HTTPS</h4><p>لازم على جهاز الـ base deployment. الـ Portal والـ Server بيجوا بشهادة self-signed افتراضيًا. للإنتاج استخدم CA-signed (داخلية أو تجارية)، وللمكونات اللي بتواجه العملاء (Web Adaptor وload balancer وreverse proxy) شهادات موثوقة. شهادة الـ federated server الخارجية لازم تكون CA-signed.</p></div>
+</div>
+<p><strong>الإنترنت:</strong> محتاج اتصال بالإنترنت لـ Esri basemaps وLiving Atlas وبيانات ArcGIS Online والـ distributed collaboration. لو الشبكة منعزلة (disconnected) لازم تظبط الموارد محليًا.</p>
+<div class="callout real"><div class="callout-title">مثال: ليه الـ FQDN والـ alias مهمين من أول يوم</div>
+<p>فريق ركّب Enterprise باسم الجهاز <code>SRV-GIS-01</code>، وبعد 6 شهور انتقلوا لجهاز جديد. الـ items كلها بتشاور على الاسم القديم، فبعضها وقف. لو كانوا سجلوا alias <code>gis.company.com</code> من الأول، كان تغيير سطر في الـ DNS يكفي.</p></div>
+
+<h2 id="databases">قواعد البيانات والـ virtualization والـ cloud</h2>
+<ul>
+<li>أغلب قواعد البيانات محتاجة <strong>ODBC client</strong> (برنامج تعريف بيخلي ArcGIS يكلم قاعدة البيانات) على أجهزة ArcGIS Server، فنظام التشغيل لازم يدعم السيرفر والـ driver معًا.</li>
+<li>الـ Enterprise شغال على on-premises وcloud وvirtual machines، لكن الصفحة <em>ما بتدّيش</em> مواصفات خاصة بالـ virtualization.</li>
+<li>ArcGIS Server <strong>مش بيشتغل على NFS</strong>.</li>
+<li>ArcGIS License Manager <strong>لم يعد مطلوبًا</strong> لترخيص named users لـ ArcGIS Pro وextensions.</li>
+</ul>
+
+<h2 id="pillars">الـ 5 محاور: متطلبات النظام</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p><strong>Why:</strong> أول متطلبات الشبكة هي DNS وHTTPS، قبل أي port. الجهاز اللي مفيهوش FQDN صحيح والـ ports مقفولة، مش هيكمّل التركيب. الجدول الكامل للـ ports في <a data-go="ports" href="#">صفحة الـ ports</a>.</p>
+<ul>
+<li>اتأكد إن اسم الجهاز بدون underscore، وإنه مسجّل في DNS، وإن الـ portal machine بيحل اسمه صح من الأجهزة التانية.</li>
+<li>لو IPv6 متعطل في الشركة، اتبع تعليمات Microsoft.</li>
+<li>الـ Windows Firewall على الجهاز لازم يسمح بالـ ports المطلوبة قبل الـ federation.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>التركيب لازم يتم بحساب <strong>Windows administrator</strong>. ما تركّبش على domain controller.</li>
+<li>على Linux: التركيب بحساب غير root.</li>
+<li>الـ Web Adaptor على IIS بيعمل Application Pool بهوية خاصة.</li>
+<li>حسابات الخدمة نفسها (domain/gMSA) متشرحة في صفحات <a data-go="multi-machine-wa" href="#">multi-machine</a>.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين</h3>
+<ul>
+<li>الأرقام اللي في الصفحة هي <strong>التركيب فقط</strong>. الـ content directory والـ caches والـ backups بتتحسب منفصلة.</li>
+<li>الـ Data Store: راقب عتبات 10 GB (تحذير) و5 GB (قراءة فقط).</li>
+<li>اتجنب NFS لـ ArcGIS Server، وext3 على Linux للـ Portal.</li>
+<li>لو الـ backup محلي على نفس الجهاز، هياكل المساحة وبيضيع لو الجهاز راح.</li>
+</ul>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>المخالفة</th><th>العرض</th><th>التشخيص</th></tr></thead>
+<tbody>
+<tr><td>اسم جهاز فيه underscore</td><td>التركيب بيتوقف في الـ diagnostics</td><td>غيّر الاسم وأعد المحاولة</td></tr>
+<tr><td>تشغيل <code>setup.msi</code> بدون C++ Redistributable</td><td>فشل التركيب</td><td>شغّل <code>setup.exe</code> أو ركّب الـ Redistributable (14.44.35211+)</td></tr>
+<tr><td>IIS ناقص مكونات أو Hosting Bundle قبل IIS</td><td>الـ Web Adaptor setup بيفشل أو الموقع بيدي 500</td><td>فعّل مكونات IIS وأعمل Repair للـ Hosting Bundle</td></tr>
+<tr><td>القرص امتلى على Data Store</td><td>الـ hosted layers بتتحول للقراءة فقط، المساحين يفشلوا في الإرسال</td><td>امسح أو زوّد المساحة فوق 5 GB، وراقب التنبيهات</td></tr>
+<tr><td>RAM أقل من الحد الأدنى</td><td>بطء شديد أو services بتقع</td><td>راجع Task Manager وعدد ArcSOC.exe</td></tr>
+<tr><td>تغيير اسم الـ DNS بعد التركيب</td><td>items قديمة ما بتفتحش</td><td>ارجع للاسم القديم أو أعد إنشاء المحتوى</td></tr>
+</tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الموضوع</th><th>الحد الأدنى (للتجربة)</th><th>الممارسة للإنتاج</th></tr></thead>
+<tbody>
+<tr><td>Portal CPU</td><td>2 cores</td><td>4 cores على الأقل (Esri بتوصي بشدة)</td></tr>
+<tr><td>ArcGIS Server RAM</td><td>8 GB</td><td>زوّد حسب عدد الـ services والـ instances والـ analysis</td></tr>
+<tr><td>Enterprise Builder</td><td>50 GB على drive التركيب</td><td>90 GB أو أكتر، وdrive منفصل عن النظام</td></tr>
+<tr><td>الـ Data Store</td><td>13 GB (27 GB للـ object)</td><td>مساحة أكبر بكتير + backup في مكان مشترك + تنبيهات بالإيميل</td></tr>
+<tr><td>الشهادات</td><td>self-signed</td><td>CA-signed، وSAN لأسماء الـ alias</td></tr>
+<tr><td>الأسماء</td><td>hostname</td><td>DNS alias ثابت من قبل التركيب</td></tr>
+<tr><td>البيئة</td><td>جهاز واحد</td><td>staging مطابقة للإنتاج لتجربة التحديثات</td></tr>
+<tr><td>Sizing</td><td>تخمين</td><td>اقتراح مبدئي، قياس CPU وRAM الفعلي بعد التشغيل، وتوسيع حسب النتائج (الصفحة ما بتديش أرقام إنتاج)</td></tr>
+</tbody></table></div>
+
+<h2 id="checklist">Checklist قبل طلب الـ VM</h2>
+<ul class="checklist">
+<li><label><input type="checkbox"> نظام التشغيل Windows Server 2019 أو 2022 أو 2025 (Desktop Experience)</label></li>
+<li><label><input type="checkbox"> اسم الجهاز بدون underscore ومسجل في DNS كـ FQDN</label></li>
+<li><label><input type="checkbox"> مش domain controller</label></li>
+<li><label><input type="checkbox"> RAM حسب الجدول (8 GB حد أدنى، 32 GB للـ Enterprise Builder)</label></li>
+<li><label><input type="checkbox"> مساحة كافية على drive منفصل للتركيب والـ directories</label></li>
+<li><label><input type="checkbox"> مكونات IIS مفعّلة + Web Deploy 4.0 + ASP.NET Core 10.x Hosting Bundle</label></li>
+<li><label><input type="checkbox"> .NET 10 لو هتستخدم SOEs/SOIs</label></li>
+<li><label><input type="checkbox"> شهادة CA-signed جاهزة وDNS alias متسجل</label></li>
+<li><label><input type="checkbox"> المتصفحات 64-bit ومفعّل فيها WebGL2</label></li>
+<li><label><input type="checkbox"> قررت مكان الـ backup خارج الجهاز</label></li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/arcgis-enterprise-overall-system-requirements.html" target="_blank" rel="noopener">ArcGIS Enterprise system requirements</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>نفس الإصدار لكل المكونات، وأداة التشخيص بتفحص الجهاز وقت التركيب.</li>
+<li>Windows Server 2019/2022/2025 مع Desktop Experience، ممنوع domain controller وممنوع underscore في الاسم.</li>
+<li>ArcGIS Server: 10 GB و8 GB RAM كحد أدنى، وممنوع NFS. Portal: 4 cores للإنتاج و8 GB و30 GB.</li>
+<li>Data Store: 13 GB (27 GB للـ object)، وRAM بين 8 و32 GB حسب النوع، والقراءة فقط تحت 5 GB مساحة.</li>
+<li>Web Adaptor على IIS محتاج Web Deploy 4.0 وASP.NET Core 10.x Hosting Bundle.</li>
+<li>الصفحة ما بتديش أرقام hardware للإنتاج: الحجم بيتحدد بالمستخدمين والأحمال.</li>
+</ul>
+</section>
+<section class="topic" id="t-coordinate-systems" hidden><div class="eyebrow">System requirements and ports</div><h1>Coordinate system requirements</h1><p class="subtitle">ملفات الـ coordinate systems على السيرفر</p><p class="lead">كـ GIS specialist انت عارف إن اختيار الـ coordinate system (نظام الإحداثيات) بيحدد دقة الشغل. في Enterprise فيه مستوى تاني: بعض التحويلات بين الأنظمة (transformations) محتاجة <strong>ملفات إضافية بتتركّب على السيرفر</strong>، ولو ناقصة السيرفر بيشتغل لكن بيدّي <strong>إحداثيات مزاحة</strong> من غير ما يطلّع خطأ واضح. الصفحة دي شرح لصفحة Esri "Coordinate system requirements and installation": إيه الملفات دي، مين محتاجها، تتركّب إزاي على Windows، وإزاي تحدّثها وتضيف شبكات طرف تالت.</p>
+
+<div class="callout warn"><div class="callout-title">ملحوظة عن مصدر الصفحة دي</div>
+<p>صفحة الإصدار 12.1 الرسمية ما قدرتش أفتحها من البيئة هنا، فاعتمدت على صفحة نفس الموضوع للإصدار <strong>11.1</strong> من Esri. الفكرة والخطوات ثابتة غالبًا بين الإصدارات، لكن راجع اسم ملف التنزيل ومسارات التركيب في صفحة إصدارك قبل التنفيذ.</p></div>
+
+<h2 id="why">Why: ليه الموضوع ده مهم أصلاً؟</h2>
+<p>لما بتحوّل داتا من <code>Ain El Abd / UTM 38N</code> (مثلاً) إلى <code>WGS 1984</code>، الأداة بتحتاج <strong>معادلات التحويل</strong>. التحويلات البسيطة (زي Helmert أو geocentric translation) معادلاتها مدمجة في البرنامج. لكن التحويلات <strong>عالية الدقة</strong> بتعتمد على <strong>شبكات (grids)</strong> عبارة عن ملفات فيها فروق إزاحة لكل نقطة على سطح الأرض. الملفات دي كبيرة فمش بتتركّب افتراضيًا.</p>
+<div class="callout real"><div class="callout-title">مثال واقعي: مشروع طرق فيه داتا من مصدرين</div>
+<p>داتا التصميم جاية بنظام محلي، وداتا الـ GPS الميدانية بـ WGS84. الـ web map بتعرض الطبقتين فوق بعض. من غير ملف التحويل المناسب على السيرفر، الـ services بتتحول بتحويل مبسّط، والنتيجة إزاحة (حجمها بيختلف من منطقة لمنطقة وحسب دقة التحويل البديل). المهندس الميداني يشوف "المنهول" بعيد عن مكانه، ويفتكر إن الداتا غلط، والمشكلة في الحقيقة إن الملف ناقص على السيرفر.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div>
+<p>في Pro لما تفتح Project وتختار Geographic Transformation من قائمة، بتلاقي transformations بعضها أيقونتها تقول "مش متاحة لأن الملفات مش مركّبة". نفس الفكرة بالظبط هنا، لكن الملفات دي لازم تتركّب على <strong>السيرفر</strong> مش على جهازك. ما يكفيش إنها شغالة عندك على Pro.</p></div>
+
+<h2 id="types">إيه الملفات اللي محتاجها السيرفر؟</h2>
+<p>الصفحة بتقول إن بعض الـ transformations محتاجة ملفات إضافية علشان الـ features تتعرض صح:</p>
+<ul>
+<li><strong>تحويلات جغرافية (geographic transformations):</strong> بصيغ NTv2 وGEOCON وNADCON5 (شبكات إزاحة وطنية).</li>
+<li><strong>تحويلات رأسية (vertical transformations):</strong> مبنية على geoids أو quasi-geoids أو شبكات تحويل، زي EGM وVERTCON (فرق الارتفاعات بين المرجع الإهليلجي ومستوى سطح البحر).</li>
+</ul>
+<p>وفيه تلات أنواع ملفات:</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>النوع</th><th>إمتى تحتاجه</th><th>تحطه فين</th></tr></thead>
+<tbody>
+<tr><td><strong>ArcGIS Coordinate Systems Data</strong></td><td>"لما تشتغل بتحويلات جغرافية عالية الدقة أو بداتا ثلاثية الأبعاد (3D)"</td><td>على <strong>كل الـ machines</strong> في الـ GIS Server sites المستقلة والـ federated</td></tr>
+<tr><td><strong>Coordinate System Data (Hosted Services)</strong> (ملف <code>jpe-sdk-data.jar</code>)</td><td>للـ hosted services</td><td>على كل الـ machines في الـ <strong>hosting server site</strong></td></tr>
+<tr><td><strong>Third-party transformation grids</strong> (شبكات طرف تالت)</td><td>لتحويلات من جهات حكومية أو مزودين</td><td>على أجهزة الـ GIS Server sites. مش مطلوبة على الـ hosting site إلا لو بتنشر services بتشاور على قواعد بيانات مسجلة عليه</td></tr>
+</tbody></table></div>
+
+<h2 id="install">تركيب ArcGIS Coordinate Systems Data على Windows</h2>
+<ol class="steps">
+<li><strong>نزّل الملف من My Esri</strong><p>اسمه بالشكل <code>ArcGIS_Coordinate_Systems_Data_Windows_&lt;release_part#&gt;</code>. My Esri هو بوابة حسابك عند Esri لتنزيل البرامج.</p></li>
+<li><strong>حطه على كل جهاز في كل GIS Server site</strong><p>مش بس جهاز واحد: كل الأجهزة لأن أي جهاز ممكن يخدم الطلب.</p></li>
+<li><strong>شغّله وحدد مكان الفك (extraction)</strong><p>الافتراضي مجلد <code>CoordinateSystemsData</code> تحت <code>&lt;System Drive&gt;\<wbr>Users\<wbr>&lt;username&gt;\<wbr>Documents\<wbr>ArcGIS &lt;version&gt;</code>. تقدر تغيّره. بعد الفك الخيار "Launch the setup program" مفعّل افتراضيًا؛ لو عايز تركّب بعدين، شيله وشغّل <code>Setup.exe</code> من مجلد <code>CoordinateSystemsData</code>.</p></li>
+<li><strong>امشي في الـ wizard</strong><p>Next، وافق على الترخيص (Cancel بيخرج من التركيب)، وفي شاشة Select Features تقدر تستبعد grids معينة باختيار "This feature will not be available"، وحدد مجلد التركيب (لازم تختار feature واحد على الأقل علشان زر Change يتفعل)، ثم Next وInstall وFinish.</p></li>
+</ol>
+<p><strong>التعديل أو الحذف:</strong> سجل دخول كـ Windows administrator، افتح قائمة البرامج المثبتة، اختار ArcGIS Coordinate Systems Data: Uninstall بيشيل كل شيء، وModify/Change بيفتح الـ wizard علشان تضيف أو تشيل data sets.</p>
+
+<h2 id="hosted">تحديث ملف Hosted Services (jpe-sdk-data.jar)</h2>
+<p>لازم تحدّثه <strong>بعد أي تركيب أو upgrade لـ ArcGIS Enterprise</strong>، وبيتطلب إن الـ deployment يكون <strong>غير متاح مؤقتًا</strong>. الملف المنزّل من My Esri بيحتوي ملف واحد بس.</p>
+<div class="callout warn"><div class="callout-title">احتفظ بنسخة</div><p>عمل <em>Repair</em> أو <em>Uninstall</em> لـ ArcGIS Server بيمسح الملف ده، فلازم ترجّعه بعدها. خزّن نسخة احتياطية منه.</p></div>
+<p>على <strong>كل جهاز hosting server</strong>:</p>
+<ol class="steps">
+<li><strong>سجل دخول كـ Windows administrator</strong></li>
+<li><strong>أوقف خدمة ArcGIS Server</strong><p>من <code>services.msc</code> أو بـ <code>Stop-Service</code>.</p></li>
+<li><strong>غيّر اسم الملف القديم</strong><p>في <code>\<wbr>ArcGIS\<wbr>Server\<wbr>framework\<wbr>lib\<wbr>shared_arcgis</code> غيّر <code>jpe-sdk-data.jar</code> إلى <code>jpe-sdk-data.oldjar</code>.</p></li>
+<li><strong>حط الملف الجديد</strong> في نفس المجلد.</li>
+<li><strong>شغّل خدمة ArcGIS Server</strong></li>
+</ol>
+<pre class="code" data-lang="powershell"># مثال: استبدال الملف على جهاز hosting server
+# CHANGE_ME: مسار التركيب ومسار الملف الجديد
+$svc  = "ArcGIS Server"
+$dir  = "C:\Program Files\ArcGIS\Server\framework\lib\shared_arcgis"
+$new  = "D:\Downloads\jpe-sdk-data.jar"
+
+Stop-Service -Name $svc
+Rename-Item "$dir\jpe-sdk-data.jar" "jpe-sdk-data.oldjar"
+Copy-Item $new "$dir\jpe-sdk-data.jar"
+Start-Service -Name $svc</pre>
+<p class="cap">عدّل مسار التركيب حسب جهازك (الافتراضي <code>C:\<wbr>Program Files\<wbr>ArcGIS\<wbr>Server</code>). كرر الخطوات على كل جهاز في الـ hosting site، وغالبًا واحد واحد علشان الـ site ما يقفش كله مرة واحدة (لكن الصفحة بتطلب إن الـ deployment يكون غير متاح مؤقتًا، فخطط نافذة صيانة).</p>
+
+<h2 id="third-party">إضافة شبكات التحويل من طرف تالت</h2>
+<p>ArcGIS Server <strong>فيه تعريفات</strong> لتحويلات مبنية على شبكات، لكنه <strong>ما بيوزعش ملفات الـ grids</strong> نفسها بسبب قيود الترخيص. بتجيبها من الجهة المالكة (هيئة مساحة أو مزود)، وبعضها بيتشترى.</p>
+<ul>
+<li>بعد تركيب ArcGIS Coordinate Systems Data على كل جهاز، اعمل subfolders تحت <code>CoordinateSystemsData\<wbr>pedata</code> على كل جهاز.</li>
+<li>رتب الملفات حسب طريقة التحويل، زي <code>NTv2</code> أو <code>vertical\geoid</code>. وملفات NTv2 تتحط كمان في subfolder باسم الدولة.</li>
+<li>الصفحة بتنصحك تتواصل مع الموزع المحلي للتعليمات التفصيلية.</li>
+</ul>
+<div class="callout real"><div class="callout-title">مثال توضيحي: شبكة تحويل من جهة المساحة</div>
+<p>لو جهة المساحة في بلدك وفّرت ملف NTv2 يحوّل بين النظام المحلي وWGS84، بتحطه في <code>CoordinateSystemsData\<wbr>pedata\<wbr>NTv2\<wbr>&lt;country&gt;</code> على كل جهاز، وبعد كده الـ services المنشورة تقدر تستخدمه. (توفر الملفات وجهة توزيعها بيختلف من دولة لدولة: اسأل الموزع المحلي لـ Esri.)</p></div>
+<p>الهيئة العامة للمساحة والمعلومات الجيومكانية بتوفر (حسب الدولة) ملفات تحويل بصيغة NTv2 بين النظام المحلي وWGS84. تحطها في <code>CoordinateSystemsData\<wbr>pedata\<wbr>NTv2\<wbr>&lt;country&gt;</code> على كل جهاز، وبعد كده الـ services المنشورة تستخدمها. (اسم الجهة وتوفر الملفات بيختلف بحسب الدولة وجهة التوزيع: اسأل الموزع.)</p></div>
+
+<h2 id="pillars">الـ 5 محاور: الـ coordinate systems على السيرفر</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>مفيش ports خاصة بالـ coordinate systems: الملفات بتتحط محليًا على كل جهاز. العلاقة بالشبكة هي <strong>توزيع الملفات</strong>: لو عندك 4 أجهزة، لازم الملف يوصل لكل جهاز (بنسخ يدوي أو سكربت أو أداة توزيع الشركة). الجهاز اللي ناقصه بيدّي نتايج مختلفة عن غيره، وده بيظهر "أحيانًا صح وأحيانًا مزاح" بحسب الجهاز اللي خدم الطلب بالـ round-robin.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>التركيب والتعديل والحذف: بحساب <strong>Windows administrator</strong>.</li>
+<li>حساب خدمة ArcGIS Server لازم يقدر <strong>يقرأ</strong> مجلد <code>CoordinateSystemsData</code> (خصوصًا لو غيّرت مكان التركيب لقرص تاني أو مجلد بصلاحيات خاصة).</li>
+<li>تحميل الملفات من My Esri محتاج حساب Esri عليه الصلاحية المناسبة (عادة حساب مسؤول الشراكة).</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الملف</th><th>المكان</th><th>على أنهي أجهزة</th></tr></thead>
+<tbody>
+<tr><td>ArcGIS Coordinate Systems Data</td><td><code>...\<wbr>ArcGIS &lt;version&gt;\<wbr>CoordinateSystemsData</code> (أو مكان تختاره)</td><td>كل أجهزة كل الـ sites</td></tr>
+<tr><td>jpe-sdk-data.jar</td><td><code>\<wbr>ArcGIS\<wbr>Server\<wbr>framework\<wbr>lib\<wbr>shared_arcgis</code></td><td>كل أجهزة الـ hosting site</td></tr>
+<tr><td>شبكات طرف تالت</td><td><code>CoordinateSystemsData\<wbr>pedata\<wbr>&lt;method&gt;</code></td><td>أجهزة الـ GIS Server sites</td></tr>
+</tbody></table></div>
+<p>مسار الداتا: لما طلب بيطلب إعادة إسقاط (reprojection)، ArcSOC بتدوّر على ملف الـ grid المناسب محليًا. لو لقيته بتطبق التحويل الدقيق، ولو لأ بتختار تحويل أبسط أو بتفشل حسب الحالة. مفيش مكان مركزي: كل جهاز بيقرا من قرصه.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الحالة</th><th>اللي هتشوفه</th><th>التشخيص</th></tr></thead>
+<tbody>
+<tr><td>الـ Coordinate Systems Data ناقصة على جهاز واحد من 3</td><td>نتايج مختلفة بين طلب وطلب لنفس الـ service</td><td>قارن مجلد <code>CoordinateSystemsData</code> على كل جهاز</td></tr>
+<tr><td>ما حدّثتش jpe-sdk-data.jar بعد upgrade</td><td>أعطال في hosted services المتعلقة بالـ projection</td><td>راجع تاريخ الملف على كل hosting machine</td></tr>
+<tr><td>عملت Repair لـ ArcGIS Server</td><td>الملف اتمسح، الـ hosted services ترجع لسلوك افتراضي</td><td>رجّع النسخة الاحتياطية</td></tr>
+<tr><td>الـ grid الطرف تالت في مكان غلط</td><td>التحويل بيتجاهل الشبكة ويطبق تحويل أقل دقة (إزاحة)</td><td>تأكد من هيكل <code>pedata\&lt;method&gt;</code> وأسماء الـ subfolders</td></tr>
+<tr><td>إيقاف الـ ArcGIS Server وقت تحديث jar</td><td>توقف مؤقت للخدمة (وده متوقع)</td><td>خطط نافذة صيانة وأعلن عنها</td></tr>
+</tbody></table></div>
+<p><strong>SPOF:</strong> مفيش نقطة فشل مركزية، لكن <strong>عدم التطابق بين الأجهزة</strong> هو الخطر الحقيقي.</p>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الموضوع</th><th>الافتراضي</th><th>الأصح</th></tr></thead>
+<tbody>
+<tr><td>التركيب</td><td>ما بيتركبش افتراضيًا</td><td>ركّب ArcGIS Coordinate Systems Data على كل أجهزة كل الـ sites لو بتشتغل بدقة عالية أو 3D</td></tr>
+<tr><td>التطابق</td><td>جهاز بجهاز يدويًا</td><td>سكربت توزيع أو deployment tool، وقائمة تحقق بعد كل جهاز جديد</td></tr>
+<tr><td>بعد الـ upgrade</td><td>نسيان الـ jar</td><td>ضيف "تحديث jpe-sdk-data.jar" لقائمة خطوات الـ upgrade</td></tr>
+<tr><td>الشبكات الطرف تالت</td><td>مش موجودة</td><td>وثّق مصدر كل grid وتاريخها وإصدارها واحفظها في مكان مركزي علشان تتكرر</td></tr>
+<tr><td>اختيار الـ coordinate system</td><td>اللي جاي مع الداتا</td><td>اتفق مع الـ client على نظام إسقاط موحد وتحويل معتمد قبل النشر، واختبر بنقاط تحكم معروفة</td></tr>
+<tr><td>الاختبار</td><td>على جهاز واحد</td><td>اختبر في staging على نقطة معروفة الإحداثيات بعد أي تغيير</td></tr>
+</tbody></table></div>
+
+<h2 id="checklist">Checklist</h2>
+<ul class="checklist">
+<li><label><input type="checkbox"> حددت هل شغلي يحتاج تحويلات عالية الدقة أو 3D</label></li>
+<li><label><input type="checkbox"> نزلت ArcGIS Coordinate Systems Data من My Esri بنفس إصدار Enterprise</label></li>
+<li><label><input type="checkbox"> ركّبتها على كل أجهزة كل GIS Server sites</label></li>
+<li><label><input type="checkbox"> حدّثت jpe-sdk-data.jar على كل hosting machines (وعندي نسخة احتياطية)</label></li>
+<li><label><input type="checkbox"> رتبت الـ grids الطرف تالت تحت pedata بنفس البنية على كل جهاز</label></li>
+<li><label><input type="checkbox"> اختبرت بنقطة معروفة وقارنت النتيجة بين الأجهزة</label></li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/coordinate-system-requirements.html" target="_blank" rel="noopener">Coordinate system requirements and installation (12.1)</a></li>
+<li><a href="https://enterprise.arcgis.com/en/system-requirements/11.1/windows/coordinate-system-requirements.htm" target="_blank" rel="noopener">Coordinate system requirements (11.1: المصدر اللي اتبنت عليه الصفحة)</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>التحويلات الدقيقة (NTv2 وGEOCON وNADCON5 والرأسية EGM وVERTCON) محتاجة ملفات إضافية على السيرفر.</li>
+<li>تلات أنواع: Coordinate Systems Data (كل الأجهزة)، وjpe-sdk-data.jar (أجهزة الـ hosting)، وشبكات طرف تالت (تحت <code>pedata</code>).</li>
+<li>حدّث الـ jar بعد أي upgrade أو Repair، واحتفظ بنسخة.</li>
+<li>الخطر الحقيقي هو عدم تطابق الأجهزة: نتايج مختلفة بحسب الجهاز اللي خدم الطلب.</li>
+<li>الصفحة ما بتذكرش أحجام الملفات ولا أنهي grids بتتركب افتراضيًا.</li>
+</ul>
+</section>
+<section class="topic" id="t-scene-viewer" hidden><div class="eyebrow">System requirements and ports</div><h1>Scene Viewer requirements</h1><p class="subtitle">متطلبات عرض الـ 3D</p><p class="lead">الـ <strong>Scene Viewer</strong> هو عارض الخرائط ثلاثية الأبعاد (3D) في Portal for ArcGIS: بتفتح فيه مباني وتضاريس وسحابة نقاط (point clouds) وتعمل تحليلات رؤية. على عكس الخريطة العادية، الـ 3D بيعتمد بشدة على <strong>كرت الشاشة (GPU) على جهاز المستخدم</strong> مش على السيرفر. وده معناه إن أغلب شكاوى "المشهد بطيء أو مكسور" سببها جهاز العميل والمتصفح، مش Enterprise. الصفحة دي شرح لصفحة Esri "Scene Viewer requirements"، وهتعرف منها إيه المطلوب من المتصفح والجهاز، وإيه اللي لازم يتركّب على السيرفر علشان الـ 3D symbology تكتمل.</p>
+
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div>
+<p>في Pro الـ 3D بيشتغل على كرت الشاشة بتاع جهازك عن طريق Local Scene. Scene Viewer نفس الفكرة لكن جوه المتصفح: المتصفح بيستخدم كرت شاشة الجهاز عبر تقنية اسمها <strong>WebGL2</strong>. فجهاز بكرت شاشة ضعيف أو من غير تعريف مناسب هيعرض الـ scene بطيء حتى لو السيرفر قوي جدًا.</p></div>
+
+<h2 id="browsers">المتصفحات (Browsers)</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البيئة</th><th>المدعوم (حسب الصفحة)</th></tr></thead>
+<tbody>
+<tr><td>Desktop</td><td>أحدث إصدارات Google Chrome وMicrosoft Edge وMozilla Firefox وSafari</td></tr>
+<tr><td>Mobile</td><td>Safari على iPhone وiPad Pro، وChrome على Samsung Galaxy S وSamsung Tab S</td></tr>
+</tbody></table></div>
+
+<h2 id="webgl2">WebGL2 (الأهم)</h2>
+<p><strong>WebGL2</strong> هي واجهة في المتصفح بتخليه يرسم رسومات ثلاثية الأبعاد باستخدام الـ GPU. الصفحة بتقول إن المدعوم هو <strong>المتصفحات 64-bit ومفعّل فيها WebGL2 فقط</strong>.</p>
+<ul>
+<li>حافظ على المتصفح محدّث: الإصدارات الأحدث أسرع.</li>
+<li>اختبر الدعم بنفسك على <code>get.webgl.org/webgl2</code>، وللمساعدة <code>get.webgl.org/<wbr>troubleshooting</code>.</li>
+<li><strong>Hardware acceleration (التسريع بالعتاد)</strong> لازم يكون مفعّل في المتصفح: يعني المتصفح يستخدم كرت الشاشة بدل المعالج لرسم الصفحة.</li>
+</ul>
+<h3>تفعيل Hardware acceleration</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>المتصفح</th><th>الخطوات</th></tr></thead>
+<tbody>
+<tr><td>Chrome</td><td>Settings ثم System، فعّل "Use hardware acceleration when available" ثم Relaunch</td></tr>
+<tr><td>Edge</td><td>Settings ثم System، فعّل "Use hardware acceleration when available" ثم Restart</td></tr>
+<tr><td>Firefox</td><td>Menu ثم Options ثم System ثم General، تحت Performance علّم "Use recommended performance settings" ثم أعد التشغيل</td></tr>
+</tbody></table></div>
+<div class="callout warn"><div class="callout-title">تجاوز كرت شاشة محظور (غير مُوصى بيه دايمًا)</div>
+<p>أحيانًا المتصفح بيحظر كرت شاشة قديم أو تعريفه ضعيف. الصفحة بتذكر حلول تجاوز: في Chrome افتح <code>chrome://flags</code> وفعّل "Override software rendering list" وأعد التشغيل. وفي Firefox افتح <code>about:config</code> واضبط <code>webgl.enable-webgl2</code> على true. استخدمها فقط كتجربة، لأن المتصفح حظر الكرت لسبب (استقرار أو أداء).</p></div>
+
+<h2 id="hardware">الجهاز والكرت (Hardware)</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>المتطلب</th></tr></thead>
+<tbody>
+<tr><td>ذاكرة الجهاز Desktop</td><td>8 GB (حد أدنى مُوصى بيه)</td></tr>
+<tr><td>كرت الشاشة</td><td>عتاد 3D حديث. كروت الشاشة المخصصة عالية الأداء (dedicated) مُوصى بيها عن الـ integrated (المدمجة في المعالج)</td></tr>
+<tr><td>الموبايل</td><td>6 GB RAM كحد أدنى، ومعالج وGPU قويين متعددي الأنوية، وأحدث نسخة Android أو iOS</td></tr>
+</tbody></table></div>
+<div class="callout real"><div class="callout-title">مثال واقعي: عرض 3D لمجسم تقاطع</div>
+<p>مشروع تقاطع فيه مجسم 3D للجسر ومباني حواليه. في الاجتماع الأولاني الـ scene بتفتح بسلاسة على لاب توب المصمم (كرت مخصص)، ولكن على لاب توب مدير المشروع (كرت مدمج وذاكرة 4 GB) بتتهنج. السيرفر نفسه ما اتغيّرش. الحل: عرض الـ scene من جهاز بمواصفات الصفحة، أو تبسيط الـ scene (تقليل عدد المباني التفصيلية) للأجهزة الضعيفة.</p></div>
+
+<h2 id="web-styles">Portal for ArcGIS Web Styles (الجزء اللي على السيرفر)</h2>
+<p><strong>Why:</strong> الـ 3D symbology (رموز ثلاثية الأبعاد زي الأشجار والنباتات) محتاجة حزمة اسمها <strong>Web Styles</strong>. بدونها بتلاقي رموز ناقصة في الـ scene. الصفحة بتقول:</p>
+<ul>
+<li>الحزمة مطلوبة للمجموعة الكاملة من الـ 3D symbology (مثل Vegetation) من إصدار 10.7.1 وما بعده.</li>
+<li><strong>Basic Shapes فقط</strong> بتتركّب افتراضيًا.</li>
+<li>بتتركّب <strong>تلقائيًا</strong> مع ArcGIS Enterprise Builder.</li>
+<li>لو ركّبت المكونات يدويًا (مش بـ Builder): ركّبها <strong>بعد</strong> كل المكونات التانية. بتنزلها من My Esri.</li>
+</ul>
+<div class="callout danger"><div class="callout-title">لو نسيتها</div>
+<p>الـ scene بتفتح، لكن الأشجار والرموز المتخصصة بتختفي أو بتظهر كأشكال أساسية. ما فيش رسالة خطأ واضحة، فالمستخدم يفتكر إن الداتا غلط. اربط التركيب بقائمة التحقق بتاعتك.</p></div>
+
+<h2 id="performance">الأداء والجودة</h2>
+<ul>
+<li>اضبط إعدادات الأداء والجودة في Scene Viewer للموازنة بين السرعة وجودة العرض.</li>
+<li>لو في أيقونات أو labels ناقصة، أو artifacts (تشوهات)، أو ألوان غريبة: فعّل hardware acceleration وWebGL2، وجرّب متصفح تاني، وحدّث تعريف كرت الشاشة (video driver) من موقع المصنّع.</li>
+<li>لو المشكلة استمرت: Esri Community أو Esri Technical Support.</li>
+</ul>
+<p><strong>اللي الصفحة ما بتقولوش:</strong> مفيش متطلبات نظام تشغيل ولا شبكة ولا جداول حدود صريحة غير المذكور فوق.</p>
+
+<h2 id="pillars">الـ 5 محاور: Scene Viewer</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p><strong>Why:</strong> الـ scene بتتحمل من السيرفر على هيئة <strong>scene layers</strong> (طبقات مشهد) بيانات كبيرة. ما فيش port خاص بالـ Scene Viewer؛ بيستخدم نفس مسار الويب (443 عبر Web Adaptor، وبعدها 7443 للـ Portal و6443 للـ Server). الفرق في حجم النقل:</p>
+<ul>
+<li>الـ scene layers المستضافة (hosted) بتتخزن في الـ <strong>object store</strong> (ports <code>29879</code> و<code>19879</code> بين الـ hosting server والـ object store).</li>
+<li>الـ 3D tiles والـ point clouds كبيرة: عرض النطاق (bandwidth) بين المستخدم والسيرفر مهم. شبكة ضعيفة معناها تحميل بطيء.</li>
+<li>لو في reverse proxy أو load balancer، تأكد إن الـ timeouts عنده مش قصيرة جدًا للـ responses الكبيرة.</li>
+<li>لو الـ firewall بيحجب 29879/19879 بين الأجهزة: الـ hosted scene layers تفشل، لكن الخرائط العادية شغالة.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>المستخدم محتاج صلاحية الوصول للـ scene والـ layers (sharing: المؤسسة أو group أو public).</li>
+<li>إنشاء وتعديل الـ scenes بيحتاج user type وrole مناسب (مثلاً Creator أو أعلى).</li>
+<li>نشر hosted scene layers بيحتاج privilege للنشر على الـ hosting server، ومعالجة الـ object store بتتم بحساب خدمة الـ Data Store.</li>
+<li>تثبيت Web Styles بيحتاج حساب administrator على جهاز الـ Portal.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>فين</th><th>ملاحظة</th></tr></thead>
+<tbody>
+<tr><td>Hosted scene layers وhosted 3D tiles</td><td>Object store (داخل Data Store أو cloud storage)</td><td>الـ object store محتاج 16 GB RAM فاضية (32 GB مُوصى بيها). ولنشر hosted scene layers محتاج 48 GB على الجهاز (حسب صفحة system requirements) وزيادة الـ heap لـ 16000 MB</td></tr>
+<tr><td>Web Styles</td><td>مع الـ Portal</td><td>رموز الـ 3D symbology</td></tr>
+<tr><td>Basemaps وelevation</td><td>Esri (إنترنت) أو محلي</td><td>لو الشبكة منعزلة محتاج مصادر محلية</td></tr>
+</tbody></table></div>
+<p>مسار الطلب: المتصفح → Web Adaptor → Portal (يعرف الـ scene) → الـ scene layer URLs → hosting server → object store → tiles بتنزل للمتصفح → WebGL2 بيرسمها على الـ GPU.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead>
+<tbody>
+<tr><td>صفحة بيضاء أو رسالة WebGL غير مدعوم</td><td>المتصفح 32-bit أو WebGL2 متعطل أو الكرت محظور</td><td>get.webgl.org/webgl2 ثم فعّل hardware acceleration</td></tr>
+<tr><td>بطء شديد</td><td>كرت مدمج أو RAM قليلة أو scene تقيلة</td><td>كرت مخصص، تقليل التفاصيل، ضبط إعدادات الأداء</td></tr>
+<tr><td>أيقونات أو labels ناقصة أو ألوان غريبة</td><td>تعريف الكرت قديم</td><td>حدّث الـ video driver وجرّب متصفح تاني</td></tr>
+<tr><td>الأشجار والرموز ظاهرة كأشكال أساسية</td><td>Web Styles مش متركّبة</td><td>ركّبها بعد كل المكونات</td></tr>
+<tr><td>hosted scene layer بتفشل في النشر</td><td>RAM أو heap الـ object store غير كافية</td><td>48 GB RAM ورفع الـ heap لـ 16000 MB</td></tr>
+<tr><td>الموبايل بيهنج</td><td>RAM أقل من 6 GB</td><td>استخدم جهاز بالمواصفات أو scene مبسطة</td></tr>
+</tbody></table></div>
+<p>لاحظ إن معظم الأعطال هنا <strong>على جهاز العميل</strong>. السيرفر ما بيوقعش بسبب الـ 3D، لكن ممكن يبطّأ لو object store ضعيف.</p>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الموضوع</th><th>الافتراضي</th><th>الأصح</th></tr></thead>
+<tbody>
+<tr><td>Web Styles</td><td>Basic Shapes فقط</td><td>تركيبها بعد باقي المكونات (أو Enterprise Builder بيعملها تلقائيًا)</td></tr>
+<tr><td>أجهزة المستخدمين</td><td>أي جهاز</td><td>معيار أدنى: 8 GB RAM وكرت 3D حديث (وأفضل مخصص). للموبايل 6 GB</td></tr>
+<tr><td>المتصفح</td><td>الموجود</td><td>أحدث إصدار 64-bit، وWebGL2 وhardware acceleration مفعّلين</td></tr>
+<tr><td>الـ object store</td><td>على نفس جهاز الـ Portal</td><td>جهاز مخصص بـ RAM كافية (16 GB فأعلى، 32 GB للأداء)</td></tr>
+<tr><td>التجاوز بـ flags</td><td>تفعيل خيارات تجاوز الحظر</td><td>آخر حل، مش حل دائم</td></tr>
+<tr><td>التجربة قبل التسليم</td><td>على جهاز المطوّر</td><td>جرّب scene على أضعف جهاز مستهدف قبل ما تعتمدها للـ client</td></tr>
+</tbody></table></div>
+
+<h2 id="checklist">Checklist</h2>
+<ul class="checklist">
+<li><label><input type="checkbox"> المتصفحات 64-bit ومحدّثة، وWebGL2 مفعّل (اختبرت get.webgl.org/webgl2)</label></li>
+<li><label><input type="checkbox"> hardware acceleration مفعّل في كل المتصفحات المعتمدة</label></li>
+<li><label><input type="checkbox"> الأجهزة 8 GB RAM على الأقل (6 GB للموبايل) وكرت 3D حديث</label></li>
+<li><label><input type="checkbox"> Web Styles مركّبة على الـ Portal</label></li>
+<li><label><input type="checkbox"> الـ object store فيه RAM كافية ومساحة، وports 29879/19879 مفتوحة بين الأجهزة</label></li>
+<li><label><input type="checkbox"> جرّبت scene فعلية على أضعف جهاز مستهدف</label></li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/12.1/plan/scene-viewer-requirements.html" target="_blank" rel="noopener">Scene Viewer requirements</a></li>
+<li><a href="https://get.webgl.org/webgl2" target="_blank" rel="noopener">WebGL2 test</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>الـ 3D بيشتغل على كرت الشاشة عند العميل عبر WebGL2: متصفح 64-bit وhardware acceleration لازم.</li>
+<li>8 GB RAM على الـ desktop (6 GB للموبايل) وكرت 3D حديث، والمخصص أفضل من المدمج.</li>
+<li>Web Styles مطلوبة لمجموعة الرموز الكاملة، وبتتركّب تلقائيًا مع Enterprise Builder أو يدويًا بعد باقي المكونات.</li>
+<li>أغلب أعطال الـ Scene Viewer على جهاز العميل مش السيرفر.</li>
+<li>الـ hosted scene layers بتعتمد على الـ object store اللي محتاج RAM كبيرة.</li>
+</ul>
+</section>
+<section class="topic" id="t-ports" hidden><div class="eyebrow">System requirements and ports</div><h1>Ports used by ArcGIS Enterprise</h1><p class="subtitle">المنافذ (ports) ومصفوفة التواصل</p><p class="lead">الـ <strong>port (المنفذ)</strong> هو رقم "الباب" على السيرفر اللي برنامج معين بيسمع عليه، والـ <strong>firewall (جدار الحماية)</strong> هو الحارس اللي بيقرر أنهي باب يتفتح لمين. أغلب مشاكل التركيب والـ federation والـ HA في Enterprise سببها port مقفول بين جهازين. صفحة Esri "Ports used by ArcGIS Enterprise" (إصدار 12.1، Windows وLinux) هي المرجع الرسمي، والصفحة دي شرح كامل ليها بالعربي: كل port، مين بيكلم مين، إيه اللي بيحصل لو اتقفل، وإزاي تختبره وتفتحه على Windows. لو الفكرة نفسها جديدة عليك، ابدأ بقسم "الـ port والـ firewall" في <a data-go="glossary" href="#">قاموس المصطلحات</a>.</p>
+
+<div class="callout note"><div class="callout-title">قاعدتين من Esri في أول الصفحة</div>
+<ul>
+<li>الـ ports اللي بتتستخدم <strong>بين الأجهزة</strong> لازم تتفتح في الـ firewall بتاع كل جهاز.</li>
+<li>الـ ports اللي بتتستخدم <strong>داخليًا فقط</strong> جوه الجهاز ما بتتفتحش للشبكة، لكن لازم تكون <strong>فاضية</strong> (مفيش برنامج تاني ماسكها).</li>
+</ul></div>
+
+<h2 id="concepts">مفاهيم لازم تفهمها قبل الجدول</h2>
+<dl class="defs">
+<dt>Inbound / Outbound (وارد / صادر)</dt><dd>قاعدة firewall بتتكتب على الجهاز <em>المستقبِل</em> (inbound: اسمح لجهاز كذا يكلمني على port كذا). الجهاز المرسِل غالبًا مش محتاج قاعدة outbound إلا لو الشركة مقيّدة الـ outbound.</dd>
+<dt>Intramachine ports (ports داخل الجهاز)</dt><dd>ports بتتكلم بيها مكونات نفس الجهاز مع بعض (مثلاً Portal مع قاعدة بياناته الداخلية). مش مطلوب تتفتح، بس لازم تكون فاضية.</dd>
+<dt>Ephemeral ports (ports مؤقتة)</dt><dd>ports بتتفتح لحظيًا لطلب معين وتتقفل بعد ما يخلص. النطاقات الافتراضية على Windows 1024–5000 و49152–65535، ويقدر المسؤول يغيّرها. لو الشركة بتقيّد الـ outbound، لازم تسمح بالنطاق ده.</dd>
+<dt>HTTPS مقابل HTTP</dt><dd>HTTPS مشفّر (port 443 أو 6443 أو 7443)، وHTTP عادي (80 أو 6080 أو 7080) وبتقفله Esri افتراضيًا.</dd>
+</dl>
+
+<h2 id="wa">ArcGIS Web Adaptor</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>البروتوكول</th><th>الغرض</th><th>الاتجاه</th><th>لو اتقفل</th></tr></thead>
+<tbody>
+<tr><td><code>443</code></td><td>HTTPS</td><td>الـ port الافتراضي للـ Web Adaptor (على IIS)</td><td>وارد من المستخدمين</td><td>مفيش وصول للموقع (timeout)</td></tr>
+<tr><td><code>80</code></td><td>HTTP</td><td>الافتراضي الثاني، غالبًا للتحويل التلقائي لـ HTTPS</td><td>وارد من المستخدمين</td><td>اللي بيكتب <code>http://</code> بيفشل. HTTPS شغال</td></tr>
+</tbody></table></div>
+<p>تقدر تضبط port غير افتراضي في حالات نادرة (مثلاً لو 443 محجوز لتطبيق تاني على نفس الجهاز).</p>
+
+<h2 id="portal">Portal for ArcGIS</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>الغرض</th><th>ملاحظة</th></tr></thead>
+<tbody>
+<tr><td><code>7443</code> (HTTPS)</td><td>الاتصال الافتراضي بالـ Portal</td><td>مفروض افتراضيًا. الـ Web Adaptor والـ Server بيكلموه عليه</td></tr>
+<tr><td><code>7080</code> (HTTP)</td><td>غير مستخدم إلا لو فعّلت HTTP</td><td>ما تفتحوش إلا لو ضروري</td></tr>
+<tr><td><code>50432</code> (TCP)</td><td>لازم يكون فاضي أثناء الـ upgrade</td><td>اتأكد إن مفيش برنامج تاني ماسكه قبل أي ترقية</td></tr>
+</tbody></table></div>
+<p><strong>ports داخل الجهاز (intramachine):</strong> <code>50432</code> و<code>7005</code> و<code>7080</code> (لو HTTP مفعّل) و<code>7099</code> و<code>7120</code> و<code>7220</code> و<code>7443</code> و<code>7654</code> و<code>7820</code> و<code>7830</code> و<code>7840</code> و<code>11211</code>.</p>
+<p><strong>بين أجهزة Portal في الـ HA:</strong> لازم تتفتح بين كل أجهزة الـ Portal: <code>50432</code> و<code>7080</code> (لو HTTP مفعّل) و<code>7120</code> و<code>7443</code> و<code>7654</code> و<code>7820</code> و<code>7830</code> و<code>7840</code> و<code>11211</code>. (لاحظ إن <code>7005</code> و<code>7099</code> و<code>7220</code> داخل الجهاز بس.)</p>
+
+<h2 id="server">ArcGIS Server</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>الغرض</th><th>تفاصيل</th></tr></thead>
+<tbody>
+<tr><td><code>6443</code> (HTTPS)</td><td>الـ port الافتراضي الوحيد للتواصل</td><td>بيتستخدم كمان <strong>بين أجهزة ArcGIS Server</strong>، فلازم الـ firewall يسمح بـ HTTPS عليه. المستخدمين ممكن يوصلوا عليه مباشرة إلا لو عطّلت الوصول المباشر وخليت الـ Web Adaptor هو الطريق</td></tr>
+<tr><td><code>6080</code> (HTTP)</td><td>معطّل افتراضيًا</td><td>ممكن تفعّله من Administrator Directory لكنه أقل أمانًا. مع Enterprise Builder الـ wizard بيبدأ على 6080 وبعدين يتحول لـ 6443. لو ArcGIS Server اتركّب لوحده، Manager بيفتح على 6443</td></tr>
+<tr><td><code>6006</code> (داخلي)</td><td>مطلوب علشان ArcGIS Server يبدأ</td><td>لازم فاضي. <strong>ما بيتحولش تلقائيًا</strong> لـ port تاني لو محجوز، فلو برنامج تاني ماسكه الـ Server مش هيبدأ</td></tr>
+<tr><td><code>1098</code> و<code>6099</code> و<code>6843</code> وports عشوائية (داخلي)</td><td>تشغيل العمليات على كل جهاز</td><td>مش محتاجة تتفتح لأجهزة تانية. لو واحد محجوز، ArcGIS Server بيزوّد للي بعده (مثلاً 1098 يبقى 1099)</td></tr>
+</tbody></table></div>
+<div class="callout danger"><div class="callout-title">لو فشل إنشاء الـ site: "Failed to create the service 'System/CachingTools.GPServer'"</div>
+<p>غالبًا الـ firewall على نفس الجهاز بيحجب الـ ports الداخلية. على Windows ضيف قواعد <strong>inbound</strong> لهذه البرامج (استبدل مسار التركيب):</p>
+<ul>
+<li><code>&lt;ArcGIS Server&gt;\<wbr>framework\<wbr>runtime\<wbr>ArcGIS\<wbr>bin\<wbr>ArcSOC.exe</code></li>
+<li><code>&lt;ArcGIS Server&gt;\<wbr>framework\<wbr>etc\<wbr>service\<wbr>bin\<wbr>ArcGISServer.exe</code></li>
+<li><code>&lt;ArcGIS Server&gt;\<wbr>framework\<wbr>runtime\<wbr>jre\<wbr>bin\<wbr>javaw.exe</code></li>
+<li><code>&lt;ArcGIS Server&gt;\<wbr>framework\<wbr>runtime\<wbr>jre\<wbr>bin\<wbr>rmid.exe</code></li>
+</ul>
+<p>وكمان حساب Windows اللي بيشغّل ArcGIS Server لازم يكون له صلاحية على <strong>Command Prompt</strong>.</p></div>
+
+<h2 id="datastore">ArcGIS Data Store</h2>
+<h3>ports لكل أنواع الـ Data Store</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>الغرض</th><th>لو اتقفل</th></tr></thead>
+<tbody>
+<tr><td><code>2443</code> (HTTPS)</td><td>التواصل بين أجهزة الـ Data Store، والـ configuration wizard، والـ hosting server site، وأداة <code>webgisdr</code> (النسخ الاحتياطي) اللي بتتركّب مع Portal</td><td>مش هتقدر تهيّئ أو تدير أو تعمل backup</td></tr>
+<tr><td><code>6443</code> (HTTPS)</td><td>طلبات صادرة من الـ Data Store للـ hosting ArcGIS Server site</td><td>الـ Data Store مش بيقدر يتسجل أو يتأكد مع الـ Server</td></tr>
+<tr><td><code>9006</code> (TCP)</td><td>الـ web server الداخلي</td><td>لازم فاضي. مش محتاج firewall</td></tr>
+</tbody></table></div>
+<h3>Relational store (للـ hosted feature layers)</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>الغرض</th></tr></thead>
+<tbody>
+<tr><td><code>9876</code></td><td>الـ hosting server → الـ relational store، وبعض traffic بين الـ primary والـ standby</td></tr>
+<tr><td><code>9840</code></td><td>الـ hosting server → قاعدة الـ in-memory cache على أجهزة الـ relational store</td></tr>
+<tr><td><code>9820</code> و<code>9850</code></td><td>التواصل بين أجهزة الـ Data Store</td></tr>
+<tr><td><code>45671</code> و<code>45672</code></td><td>لازم يكونوا متاحين للتواصل مع GIS Server sites (الـ service webhooks محتاجاهم)</td></tr>
+<tr><td><code>25672</code> و<code>44369</code></td><td>لازم يكونوا متاحين (service webhooks)</td></tr>
+<tr><td><code>50432</code></td><td>لازم يكون متاح وقت ترقية الـ relational store</td></tr>
+</tbody></table></div>
+<p><strong>Webhook (خطّاف ويب)</strong>: آلية بتبعت إشعار تلقائي لما يحصل حدث (مثلاً feature اتعدّلت) لبرنامج تاني.</p>
+<h3>Object store (للـ scene layers والـ caches)</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>الغرض</th></tr></thead>
+<tbody>
+<tr><td><code>29879</code> و<code>19879</code> (HTTPS)</td><td>الـ hosting server → الـ object store</td></tr>
+<tr><td><code>19864</code> و<code>29860–29863</code> (Hadoop RPC)</td><td>الـ cluster والعمليات الداخلية بين الأجهزة</td></tr>
+<tr><td><code>29858</code> و<code>29859</code> و<code>28981</code> و<code>29895</code> (gRPC)</td><td>الـ cluster والعمليات الداخلية</td></tr>
+<tr><td><code>9856</code> و<code>9857</code> و<code>9872</code> و<code>9886</code> و<code>9894</code> (HTTP/2)</td><td>الـ cluster والعمليات الداخلية</td></tr>
+<tr><td><code>11211</code> (TCP)</td><td>عمليات داخلية: لازم متاح</td></tr>
+</tbody></table></div>
+<h3>Spatiotemporal big data store</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>الغرض</th></tr></thead>
+<tbody>
+<tr><td><code>9220</code> (HTTPS)</td><td>الـ hosting والـ federated ArcGIS Server sites، وتواصل الـ cluster</td></tr>
+<tr><td><code>9320</code> (TCP)</td><td>تواصل الـ cluster</td></tr>
+</tbody></table></div>
+<h3>Graph store (لـ Knowledge Server)</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Port</th><th>الغرض</th></tr></thead>
+<tbody>
+<tr><td><code>9829</code> (TCP)</td><td>ArcGIS Knowledge Server → الـ graph store، وتواصل الـ cluster</td></tr>
+<tr><td><code>9828</code> و<code>9830</code> و<code>9831</code> (TCP)</td><td>تواصل الـ cluster</td></tr>
+</tbody></table></div>
+<p>لو الـ Data Store على أكتر من جهاز (multimachine)، الـ ports اللي بين الأجهزة لازم تتفتح على <strong>كل</strong> الأجهزة.</p>
+
+<h2 id="others">باقي الـ servers</h2>
+<p>الصفحة الرسمية <strong>ما بتديش أرقام</strong> الـ ports لـ: ArcGIS GeoEvent Server (فيه صفحة لـ Windows وصفحة لـ Linux)، وWorkflow Manager Server، وNotebook Server، وMission Server، وData Pipelines Server، وVideo Server. بتحيل لصفحة كل واحد. قبل ما تكتب أي قاعدة firewall لأي منهم، افتح صفحته. وأنا مش هخترع أرقام ناقصة.</p>
+
+<h2 id="matrix">مصفوفة التواصل: مين بيكلم مين (Deployment متعدد الأجهزة)</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>من</th><th>إلى</th><th>Port</th><th>لازم تتفتح في firewall جهاز...</th></tr></thead>
+<tbody>
+<tr><td>المستخدمين</td><td>Web Adaptor / Load balancer</td><td>443 (و80)</td><td>الـ IIS / الـ LB</td></tr>
+<tr><td>Web Adaptor (Portal)</td><td>Portal</td><td>7443</td><td>جهاز الـ Portal</td></tr>
+<tr><td>Web Adaptor (Server)</td><td>ArcGIS Server</td><td>6443</td><td>جهاز الـ Server</td></tr>
+<tr><td>Portal</td><td>ArcGIS Server</td><td>6443</td><td>جهاز الـ Server</td></tr>
+<tr><td>ArcGIS Server</td><td>Portal</td><td>7443</td><td>جهاز الـ Portal</td></tr>
+<tr><td>ArcGIS Server (hosting)</td><td>Data Store (relational)</td><td>2443 و9876 و9840</td><td>جهاز الـ Data Store</td></tr>
+<tr><td>ArcGIS Server (hosting)</td><td>Data Store (object)</td><td>29879 و19879</td><td>جهاز الـ Data Store</td></tr>
+<tr><td>Data Store</td><td>ArcGIS Server (hosting)</td><td>6443</td><td>جهاز الـ Server</td></tr>
+<tr><td>Portal (webgisdr)</td><td>Data Store</td><td>2443</td><td>جهاز الـ Data Store</td></tr>
+<tr><td>Server ↔ Server (نفس الـ site)</td><td></td><td>6443</td><td>كل أجهزة الـ Server</td></tr>
+<tr><td>Portal ↔ Portal (HA)</td><td></td><td>7443 و7120 و7654 و7820 و7830 و7840 و11211 و50432</td><td>كل أجهزة الـ Portal</td></tr>
+<tr><td>Data Store ↔ Data Store</td><td></td><td>2443 و9820 و9850 وغيرها حسب النوع</td><td>كل أجهزة الـ Data Store</td></tr>
+</tbody></table></div>
+<p class="cap">الجدول تجميع منا من صفحة Esri ومن صفحة الـ base deployment. وصلات Server ↔ Portal وWeb Adaptor مبنية على الـ ports الافتراضية الموثقة، وبعض القواعد (مثل 7443 من Server إلى Portal) هي اتجاه الاستخدام الفعلي الموضح في صفحات الـ federation.</p>
+
+<h2 id="windows-firewall">فتح الـ ports على Windows Firewall</h2>
+<p><strong>Why:</strong> Windows Firewall بيقفل أي inbound مش مسموح بيه. التركيب بيضيف قواعد لبعض البرامج، لكن لو الشركة عندها firewall مركزي (مثل GPO أو hardware firewall)، لازم تطلب من فريق الشبكة.</p>
+<pre class="code" data-lang="powershell"># مثال: فتح port 7443 للـ Portal، مسموح من IP جهاز الـ IIS فقط
+# CHANGE_ME: الـ IP والـ port واسم القاعدة
+New-NetFirewallRule -DisplayName "ArcGIS Portal 7443 from IIS" `
+  -Direction Inbound -Protocol TCP -LocalPort 7443 `
+  -RemoteAddress 10.20.5.11 -Action Allow
+
+# اختبار من جهاز الـ IIS إلى جهاز الـ Portal
+Test-NetConnection -ComputerName portal01.company.com -Port 7443
+# TcpTestSucceeded : True  = الـ port مفتوح
+
+# اعرف مين ماسك port معين على الجهاز (لو لازم يكون فاضي)
+Get-NetTCPConnection -LocalPort 6006 -ErrorAction SilentlyContinue |
+  Select-Object LocalAddress, LocalPort, State, OwningProcess</pre>
+<p class="cap">القاعدة بتحدد IP المصدر (<code>-RemoteAddress</code>) بدل ما تفتح الـ port للكل. ده مبدأ least privilege (أقل صلاحية ممكنة).</p>
+
+<h2 id="pillars">الـ 5 محاور: الـ ports</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>الصفحة كلها هي المحور ده. الخلاصة العملية بتتقسم لتلات طبقات:</p>
+<ul>
+<li><strong>للمستخدمين (من الخارج):</strong> 443 فقط (وممكن 80 للتحويل). ولا 6443 ولا 7443 ولا 2443.</li>
+<li><strong>بين الأجهزة (داخليًا):</strong> 7443 و6443 و2443 + ports الـ Data Store حسب النوع + ports الـ HA بين أجهزة نفس المكون.</li>
+<li><strong>داخل الجهاز:</strong> فاضية فقط. 6006 بالذات لأنه ما بيتحولش.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>فتح الـ ports في Windows Firewall محتاج administrator.</li>
+<li>حساب Windows اللي بيشغّل ArcGIS Server لازم يقدر يفتح Command Prompt (ملحوظة صريحة في الصفحة)، وإلا إنشاء الـ site ممكن يفشل.</li>
+<li>الـ webgisdr (النسخ الاحتياطي) بيتصل بالـ Data Store على 2443، فحساب الـ backup لازم يكون له صلاحية على Portal.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الـ ports بتحدد <strong>مسار البيانات بين المخازن</strong>:</p>
+<ul>
+<li>hosted feature layers: Server → <code>9876</code> → relational store.</li>
+<li>hosted scene layers وcaches: Server → <code>29879/19879</code> → object store.</li>
+<li>الـ streams المؤرشفة: Server → <code>9220</code> → spatiotemporal store.</li>
+<li>الـ knowledge graphs: Knowledge Server → <code>9829</code> → graph store.</li>
+<li>الـ file shares (config-store وdirectories): SMB على <code>445</code> (مش مذكور في صفحة Enterprise ports لأنه بروتوكول Windows عام، لكن لازم يتفتح بين أجهزة الـ site والـ file server).</li>
+</ul>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>العرض</th><th>الـ port المشتبه</th><th>التشخيص</th></tr></thead>
+<tbody>
+<tr><td>الموقع مش بيفتح خالص (timeout)</td><td>443 على IIS أو الـ LB</td><td><code>Test-NetConnection</code> من جهاز خارجي</td></tr>
+<tr><td>502 / 504 من الـ Web Adaptor</td><td>7443 أو 6443 بين IIS والخلفية</td><td>اختبر من جهاز IIS لكل جهاز خلفي</td></tr>
+<tr><td>الـ federation فاشل</td><td>6443 و7443 في الاتجاهين</td><td>اختبر الاتجاهين، وراجع الشهادات</td></tr>
+<tr><td>hosted layers بتفشل والـ referenced شغالة</td><td>9876 أو 9840 أو 2443</td><td>اختبر من الـ hosting server للـ Data Store</td></tr>
+<tr><td>hosted scene layers بتفشل</td><td>29879 أو 19879</td><td>نفس الاختبار</td></tr>
+<tr><td>Portal standby ما بيتزامنش</td><td>7120 أو 7654 أو 7820/30/40 أو 50432</td><td>اختبر بين جهازي الـ Portal</td></tr>
+<tr><td>ArcGIS Server ما بيبدأش</td><td>6006 محجوز</td><td><code>Get-NetTCPConnection -LocalPort 6006</code></td></tr>
+<tr><td>إنشاء الـ site بيفشل (CachingTools.GPServer)</td><td>ports داخلية محجوبة</td><td>ضيف قواعد البرامج الأربعة (ArcSOC وArcGISServer وjavaw وrmid)</td></tr>
+<tr><td>الـ upgrade بيفشل</td><td>50432 محجوز (Portal أو relational store)</td><td>تأكد إنه فاضي قبل الترقية</td></tr>
+</tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الموضوع</th><th>الافتراضي</th><th>الأصح</th></tr></thead>
+<tbody>
+<tr><td>تعرّض الـ ports للمستخدمين</td><td>فتح 6443/7443</td><td>443 فقط عبر Web Adaptor أو reverse proxy</td></tr>
+<tr><td>HTTP</td><td>6080 و7080 معطلين افتراضيًا</td><td>ابقيهم معطلين</td></tr>
+<tr><td>قواعد الـ firewall</td><td>فتح للكل</td><td>قواعد بـ IP مصدر محدد، ومصفوفة موثقة تتراجع كل ربع سنة</td></tr>
+<tr><td>التوثيق</td><td>قواعد غير موثقة</td><td>احتفظ بجدول من/إلى/port/السبب. وراجعه عند أي إضافة مكون</td></tr>
+<tr><td>الاختبار بعد كل تغيير في الشبكة</td><td>يدوي</td><td>سكربت <code>Test-NetConnection</code> بيمر على المصفوفة ويطبع النتيجة</td></tr>
+<tr><td>Ports الـ servers الإضافية</td><td>تخمين</td><td>من صفحة كل server الرسمية</td></tr>
+</tbody></table></div>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/12.1/plan/ports-overall.html" target="_blank" rel="noopener">Ports used by ArcGIS Enterprise (12.1)</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>للمستخدمين 443 بس؛ بين الأجهزة 7443 (Portal) و6443 (Server) و2443 (Data Store).</li>
+<li>الـ ports الداخلية لازم تكون فاضية: أهمهم 6006 (ما بيتحولش) و50432 وقت الـ upgrade.</li>
+<li>كل نوع Data Store له ports خاصة (relational 9876، object 29879/19879، spatiotemporal 9220، graph 9829).</li>
+<li>الـ HA بيحتاج ports إضافية مفتوحة بين أجهزة نفس المكون.</li>
+<li>أرقام ports الـ servers الإضافية مش في الصفحة العامة: راجع صفحة كل واحد.</li>
+<li>اختبر كل وصلة بـ <code>Test-NetConnection</code> بدل ما تستنى الأعراض.</li>
 </ul>
 </section>
 <section class="topic" id="t-deployment-scenarios" hidden><div class="eyebrow">Deployment scenarios</div><h1>Deployment scenarios</h1><p class="subtitle">نظرة عامة والمصطلحات</p><p class="lead">صفحة Esri "Deployment scenarios" هي المدخل لمجموعة صفحات بتشرح <strong>إزاي تركّب ArcGIS Server site بأحجام وأشكال مختلفة</strong>: من machine واحدة للتجربة، لحد pool من الـ machines ورا load balancer للإنتاج الكبير. الصفحة دي بتعرّف المصطلحات (site، web adaptor، reverse proxy، NLB، server directories، configuration store)، وبتوريك خريطة السيناريوهات الأربعة اللي هنشرحها في الصفحات الجاية. افهم المصطلحات هنا كويس، لأن كل الصفحات اللي بعدها بتتبني عليها.</p>
@@ -2035,7 +2754,7 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <div class="card"><h4>Availability</h4><p>فيه GIS server واحد، فهو <strong>single point of failure</strong>. أي عطل hardware أو software بيوقف الخدمة.</p></div>
 <div class="card"><h4>Scalability</h4><p>الـ config store والـ directories محلية، فمش هتقدر تضيف GIS servers تانية. التوسع <strong>vertical</strong> بس: تزوّد cores على نفس السيرفر.</p></div>
 <div class="card"><h4>Advantages</h4><p>سهل في التركيب والصيانة والـ upgrade. أداء عالي لأن المسارات محلية، فمثالي للـ cached map وimage services.</p></div>
-<div class="card"><h4>Disadvantages</h4><p>الأمان (Manager والـ Admin على نفس port)، منافذ غير قياسية، مفيش web-tier auth من غير Web Adaptor، ومفيش HA.</p></div>
+<div class="card"><h4>Disadvantages</h4><p>الأمان (Manager والـ Admin على نفس port)، منافذ غير قياسية، مفيش web-tier auth من غير Web Adaptor، ومفيش HA (الحل اللي Esri بتحيل له: <strong>Single-machine high-availability (active-passive) deployment</strong>، يعني جهازين واحد شغال وواحد احتياطي بيستلم لو الأول وقع).</p></div>
 </div>
 
 <h3>تقوية الأمان من غير Web Adaptor: allowedAdminAccessIPs</h3>
@@ -2589,7 +3308,7 @@ Invoke-RestMethod -Uri "https://$($server):6443/arcgis/rest/info/healthCheck?f=j
 <script>
 (function(){
 "use strict";
-var NAV = [{"id": "start", "title": "Start here", "topics": [{"id": "glossary", "title": "IT foundations and glossary", "ar": "أساسيات الـ IT وقاموس المصطلحات من الصفر"}]}, {"id": "intro", "title": "Introduction", "topics": [{"id": "what-is", "title": "What is ArcGIS Enterprise?", "ar": "إيه هو ArcGIS Enterprise"}]}, {"id": "choose", "title": "Choosing a platform", "topics": [{"id": "agol-vs-enterprise", "title": "ArcGIS Online vs Enterprise", "ar": "الفرق والاختيار بينهم"}]}, {"id": "plan", "title": "Planning a deployment", "topics": [{"id": "evaluate-needs", "title": "Evaluate your organization's needs", "ar": "قيّم احتياجاتك قبل التصميم"}, {"id": "base-deployment-plan", "title": "Base ArcGIS Enterprise deployment", "ar": "الـ base deployment وأنماطه"}, {"id": "additional-servers", "title": "Additional server deployment", "ar": "الـ servers الإضافية"}, {"id": "server-extensions", "title": "Server extensions", "ar": "الـ extensions والـ editions"}]}, {"id": "dep", "title": "Deployment scenarios", "topics": [{"id": "deployment-scenarios", "title": "Deployment scenarios", "ar": "نظرة عامة والمصطلحات"}, {"id": "single-machine", "title": "Single-machine deployment", "ar": "site على machine واحدة"}, {"id": "single-machine-proxy", "title": "Single machine with reverse proxy", "ar": "machine واحدة مع reverse proxy"}, {"id": "multi-machine-wa", "title": "Multiple machines with Web Adaptor", "ar": "أكتر من machine مع Web Adaptor"}, {"id": "multi-machine-lb", "title": "Multiple machines with load balancer", "ar": "أكتر من machine مع load balancer"}]}];
+var NAV = [{"id": "start", "title": "Start here", "topics": [{"id": "glossary", "title": "IT foundations and glossary", "ar": "أساسيات الـ IT وقاموس المصطلحات من الصفر"}]}, {"id": "intro", "title": "Introduction", "topics": [{"id": "what-is", "title": "What is ArcGIS Enterprise?", "ar": "إيه هو ArcGIS Enterprise"}]}, {"id": "choose", "title": "Choosing a platform", "topics": [{"id": "agol-vs-enterprise", "title": "ArcGIS Online vs Enterprise", "ar": "الفرق والاختيار بينهم"}]}, {"id": "plan", "title": "Planning a deployment", "topics": [{"id": "evaluate-needs", "title": "Evaluate your organization's needs", "ar": "قيّم احتياجاتك قبل التصميم"}, {"id": "base-deployment-plan", "title": "Base ArcGIS Enterprise deployment", "ar": "الـ base deployment وأنماطه"}, {"id": "additional-servers", "title": "Additional server deployment", "ar": "الـ servers الإضافية"}, {"id": "server-extensions", "title": "Server extensions", "ar": "الـ extensions والـ editions"}]}, {"id": "req", "title": "System requirements and ports", "topics": [{"id": "system-requirements", "title": "ArcGIS Enterprise system requirements", "ar": "متطلبات النظام: الأجهزة والـ OS والمتصفحات"}, {"id": "coordinate-systems", "title": "Coordinate system requirements", "ar": "ملفات الـ coordinate systems على السيرفر"}, {"id": "scene-viewer", "title": "Scene Viewer requirements", "ar": "متطلبات عرض الـ 3D"}, {"id": "ports", "title": "Ports used by ArcGIS Enterprise", "ar": "المنافذ (ports) ومصفوفة التواصل"}]}, {"id": "dep", "title": "Deployment scenarios", "topics": [{"id": "deployment-scenarios", "title": "Deployment scenarios", "ar": "نظرة عامة والمصطلحات"}, {"id": "single-machine", "title": "Single-machine deployment", "ar": "site على machine واحدة"}, {"id": "single-machine-proxy", "title": "Single machine with reverse proxy", "ar": "machine واحدة مع reverse proxy"}, {"id": "multi-machine-wa", "title": "Multiple machines with Web Adaptor", "ar": "أكتر من machine مع Web Adaptor"}, {"id": "multi-machine-lb", "title": "Multiple machines with load balancer", "ar": "أكتر من machine مع load balancer"}]}];
 var $ = function(s,r){return (r||document).querySelector(s)};
 var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var flat = [];
