@@ -327,10 +327,10 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <h2 id="firewall-dmz">Firewall و DMZ</h2>
 <dl class="defs">
 <dt>Firewall (جدار ناري)</dt><dd>قواعد بتقول: "اسمح بالـ traffic من IP كذا على port كذا، وامنع الباقي". ممكن يكون جهاز مخصص أو برنامج على الـ machine نفسها (Windows Firewall).</dd>
-<dt>DMZ — Demilitarized Zone (المنطقة المنزوعة السلاح)</dt><dd>شبكة وسيطة بين الإنترنت وشبكة الشركة الداخلية. الأجهزة اللي لازم تتكلم مع الإنترنت (زي الـ reverse proxy) بتتحط فيها، علشان لو اتخترقت ما توصلش مباشرة للداخل.</dd>
+<dt>DMZ — Demilitarized Zone (المنطقة المنزوعة السلاح)</dt><dd>شبكة وسيطة بين الإنترنت وشبكة الشركة الداخلية. الأجهزة اللي لازم تتكلم مع الإنترنت (زي الـ reverse proxy) بتتحط فيها، علشان لو اخترقت ما توصلش مباشرة للداخل.</dd>
 </dl>
 <div class="callout real"><div class="callout-title">مثال: خريطة عامة للمواطنين</div>
-<p>جهة عايزة تنشر خريطة مشروع للعامة. الـ web server (IIS مع Web Adaptor) بيتحط في الـ DMZ، والـ firewall الخارجي بيفتح 443 بس. السيرفرات الفعلية (Portal وArcGIS Server) في الشبكة الداخلية، ومفتوح ليهم من الـ DMZ بس. لو اتخترق الـ web server، المخترق لسه محتاج يعدّي firewall تاني.</p></div>
+<p>جهة عايزة تنشر خريطة مشروع للعامة. الـ web server (IIS مع Web Adaptor) بيتحط في الـ DMZ، والـ firewall الخارجي بيفتح 443 بس. السيرفرات الفعلية (Portal وArcGIS Server) في الشبكة الداخلية، ومفتوح ليهم من الـ DMZ بس. لو اخترق الـ web server، المخترق لسه محتاج يعدّي firewall تاني.</p></div>
 
 <h2 id="proxy-lb">Reverse Proxy و Load Balancer</h2>
 <dl class="defs">
@@ -755,7 +755,7 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 </tbody></table></div>
 <div class="callout real"><div class="callout-title">مثال: لماذا بيفشل النشر بعد ما كان شغال؟</div>
 <p>مدير الشبكة نقل مجلد <code>arcgisserver\<wbr>directories</code> لـ NAS وغيّر صلاحياته، فالحساب <code>arcgis</code> المحلي ما بقاش له صلاحية كتابة. النتيجة: نشر الخدمات بيرجّع "access denied" والـ caches ما بتتكتبش. العلاج الصحيح: حساب domain (أو gMSA) بصلاحية Modify على الـ NAS، مش Administrator.</p></div>
-<div class="callout warn"><div class="callout-title">Least privilege: أقل صلاحيات ممكنة</div><p>متديش حساب الخدمة صلاحيات Domain Admin "علشان تضمن إنه يشتغل". أعطيه Modify على مجلدات التطبيق بس. حساب خدمة بصلاحيات واسعة لو اتخترق، المهاجم بياخد نفس الصلاحيات.</p></div>
+<div class="callout warn"><div class="callout-title">Least privilege: أقل صلاحيات ممكنة</div><p>متديش حساب الخدمة صلاحيات Domain Admin "علشان تضمن إنه يشتغل". أعطيه Modify على مجلدات التطبيق بس. حساب خدمة بصلاحيات واسعة لو اخترق، المهاجم بياخد نفس الصلاحيات.</p></div>
 
 <h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
 <p><strong>Why:</strong> لازم تعرف أنهي داتا فين، لأن ده بيحدد إيه اللي تعمله له backup، وإيه اللي بيبقى بطيء، وإيه اللي بيضيع لو machine وقعت.</p>
