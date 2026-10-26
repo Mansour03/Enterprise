@@ -427,7 +427,9 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <tr><td>504</td><td>Gateway Timeout</td><td>الوسيط استنى السيرفر الخلفي ومجاش رد في الوقت المحدد.</td><td>firewall بيقفل port بين الوسيط والسيرفر، أو السيرفر بطيء جدًا (query تقيل).</td></tr>
 </tbody></table></div>
 <div class="callout real"><div class="callout-title">مثال: إزاي تفكر لما تشوف 502</div>
-<p>مستخدمين بلّغوا إن الخرائط بتظهر خطأ 502. نفكر بالترتيب: (1) هل الـ IIS شغال؟ (2) هل الـ Web Adaptor بتاع الـ server بيوصل لـ <code>6443</code>؟ جرّب من الـ IIS machine نفسها: <code>Test-NetConnection gisserver -Port 6443</code>. (3) هل خدمة <strong>ArcGIS Server</strong> شغالة في Windows Services على الـ machine الخلفية؟ (4) لو السيرفر شغال، شوف الـ logs. التفكير ده (من الوسيط للخلف) هو أساس صفحة troubleshooting اللي هنكتبها لاحقًا.</p></div>
+<p>مستخدمين بلّغوا إن الخرائط بتظهر خطأ 502. نفكر بالترتيب:</p>
+<ol><li>هل الـ IIS شغال؟</li><li>هل الـ Web Adaptor بتاع الـ server بيوصل لـ <code>6443</code>؟ جرّب من الـ IIS machine نفسها: <code>Test-NetConnection gisserver -Port 6443</code>.</li><li>هل خدمة <strong>ArcGIS Server</strong> شغالة في Windows Services على الـ machine الخلفية؟</li><li>لو السيرفر شغال، شوف الـ logs.</li></ol>
+<p>التفكير ده (من الوسيط للخلف) هو أساس صفحة troubleshooting اللي هنكتبها لاحقًا.</p></div>
 
 <h2 id="windows-basics">Windows concepts: مفاهيم Windows اللي هتحتاجها</h2>
 <dl class="defs">
@@ -486,7 +488,13 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <section class="topic" id="t-what-is" hidden><div class="eyebrow">Introduction</div><h1>What is ArcGIS Enterprise?</h1><p class="subtitle">إيه هو ArcGIS Enterprise</p><p class="lead">ArcGIS Enterprise هو <strong>النظام الأساسي (foundational system)</strong> اللي بيشغّل الـ GIS جوه المؤسسة بتاعتك. بدل ما الداتا والخرائط تفضل محبوسة على جهاز كل مهندس، Enterprise بيحطها على سيرفرات مركزية وبيخلي الناس تفتحها من المتصفح أو الموبايل: خرائط (mapping)، تصوير مرئي (visualization)، تحليلات (analytics)، وإدارة بيانات (data management). والفرق الجوهري عن ArcGIS Online إن البنية التحتية (infrastructure) دي <strong>انت اللي بتتحكم فيها</strong>: داخل مقر الشركة (on-premises)، أو سحابة خاصة (private cloud)، أو سحابة عامة (public cloud). الصفحة دي شرح كامل ومفصّل لصفحة Esri الرسمية "What is ArcGIS Enterprise?" (إصدار 12.1، Windows وLinux)، لشخص عنده خبرة GIS قوية وبيبدأ في عالم السيرفرات من الصفر.</p>
 
 <div class="callout note"><div class="callout-title">إزاي تقرأ الصفحة دي</div>
-<p>الصفحة مقسّمة جزئين. <strong>الجزء الأول</strong> شرح الصفحة الرسمية بالترتيب (إيه هو Enterprise، مكوناته، السيرفرات، الترخيص). <strong>الجزء التاني</strong> (الأهم) هو الـ <strong>5 محاور الثابتة</strong> اللي هنطبقها على كل صفحة في الدليل: الشبكة والمنافذ، الحسابات، التخزين ومسار الداتا، نقاط الفشل، والممارسات الصحيحة مقابل الإعدادات الافتراضية. لو كلمة IT مش مفهومة (port, DNS, load balancer...) افتح صفحة <a data-go="glossary" href="#">أساسيات الـ IT وقاموس المصطلحات</a> الأول. الأمثلة اللي عليها علامة "مثال" من عندنا للتوضيح، مش من الـ documentation.</p></div>
+<p>الصفحة مقسّمة جزئين:</p>
+<ul>
+<li><strong>الجزء الأول:</strong> شرح الصفحة الرسمية بالترتيب (إيه هو Enterprise، مكوناته، السيرفرات، الترخيص).</li>
+<li><strong>الجزء التاني (الأهم):</strong> الـ <strong>5 محاور الثابتة</strong> اللي هنطبقها على كل صفحة في الدليل:
+<ul><li>الشبكة والمنافذ</li><li>الحسابات</li><li>التخزين ومسار الداتا</li><li>نقاط الفشل</li><li>الممارسات الصحيحة مقابل الإعدادات الافتراضية</li></ul></li>
+</ul>
+<p>لو كلمة IT مش مفهومة (port, DNS, load balancer...) افتح صفحة <a data-go="glossary" href="#">أساسيات الـ IT وقاموس المصطلحات</a> الأول. الأمثلة اللي عليها علامة "مثال" من عندنا للتوضيح، مش من الـ documentation.</p></div>
 
 <h2 id="overview">Overview: نظرة عامة</h2>
 <p>Esri بتعرّف ArcGIS Enterprise بإنه "the foundational software system for GIS" (النظام البرمجي الأساسي للـ GIS). معنى "أساسي" هنا إن باقي الأدوات (Dashboards وField Maps وSurvey123 وExperience Builder...) كلها <em>واقفة عليه</em>، وبتتكلم مع نفس المكونات ونفس الداتا. وظيفته إنه يربط <strong>المستخدمين بالداتا</strong> ويديهم:</p>
@@ -1054,7 +1062,9 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <div class="card"><h4>"Enterprise هو ArcGIS Server"</h4><p>غلط. ArcGIS Server واحد من أربع مكونات. من غير Portal وWeb Adaptor وData Store ما عندكش Web GIS كامل.</p></div>
 <div class="card"><h4>"ArcGIS Online مينفعش في شغل جاد"</h4><p>غلط. بيدعم SAML وMFA ونفس الـ APIs. الاختيار بيتحدد بالقيود (data residency, offline) مش بالجدية.</p></div>
 <div class="card"><h4>"لازم أختار واحد بس"</h4><p>غلط. كتير من المؤسسات بتستخدم الاتنين مع بعض عن طريق distributed collaboration.</p></div>
-<div class="card"><h4>"Enterprise أرخص لأنه مفيش subscription"</h4><p>لا. تكلفة التشغيل: السيرفرات، الـ IT، الـ patching، الـ backup، الـ DR، والخبرة. احسب التكلفة الكاملة.</p></div>
+<div class="card"><h4>"Enterprise أرخص لأنه مفيش subscription"</h4><p>لا. تكلفة التشغيل بتشمل:</p>
+<ul><li>السيرفرات</li><li>الـ IT</li><li>الـ patching</li><li>الـ backup</li><li>الـ DR (Disaster Recovery: التعافي من الكوارث)</li><li>الخبرة</li></ul>
+<p>احسب التكلفة الكاملة.</p></div>
 </div>
 
 <h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
@@ -1106,8 +1116,12 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 </tbody></table></div>
 
 <div class="callout real"><div class="callout-title">مثال واقعي: برنامج تقاطعات مرورية</div>
-<p>مقاول عنده برنامج تحسين 12 تقاطع. الـ workflows اللي ظهرت في ورشة (workshop) مع الفرق: (1) المساح بيحدّث نسب الإنجاز من الميدان، (2) مدير المشروع بيتابع dashboard، (3) قسم الـ QC بيراجع الداتا قبل التسليم، (4) المهندس بيحتاج يحوّل رسومات CAD لطبقات GIS كل أسبوع، (5) الـ client عايز يشوف خريطة للقراءة بس.</p>
-<p><strong>التحليل:</strong> (1) و(2) و(5) يتغطوا بالـ base deployment وuser types مختلفة (Mobile Worker وContributor وViewer). (3) و(4) يفتحوا نقاش عن Data Reviewer وData Interoperability كـ extensions، ويتقرر إيه اللي يستاهل الشراء فعلاً. من غير الورشة دي كان ممكن يتشترى كل حاجة أو ولا حاجة.</p></div>
+<p>مقاول عنده برنامج تحسين 12 تقاطع. الـ workflows اللي ظهرت في ورشة (workshop) مع الفرق:</p>
+<ol><li>المساح بيحدّث نسب الإنجاز من الميدان</li><li>مدير المشروع بيتابع dashboard</li><li>قسم الـ QC بيراجع الداتا قبل التسليم</li><li>المهندس بيحتاج يحوّل رسومات CAD لطبقات GIS كل أسبوع</li><li>الـ client عايز يشوف خريطة للقراءة بس.</li></ol>
+<p><strong>التحليل:</strong></p>
+<p>بالأرقام اللي في القايمة فوق:</p>
+<ul><li>النقاط 1 و2 و5 تتغطى بالـ base deployment وuser types مختلفة (Mobile Worker وContributor وViewer).</li><li>النقطتين 3 و4 يفتحوا نقاش عن Data Reviewer وData Interoperability كـ extensions، ويتقرر إيه اللي يستاهل الشراء فعلاً.</li></ul>
+<p>من غير الورشة دي كان ممكن يتشترى كل حاجة أو ولا حاجة.</p></div>
 
 <h2 id="system-scale">System scale: حجم النظام</h2>
 <p><strong>Why:</strong> السيرفر مش بيتعب من عدد الحسابات المسجلة، بيتعب من عدد الطلبات اللي بتوصله في نفس الثانية. ArcGIS Enterprise بيقدر يتعامل مع <strong>حجم كبير جدًا من الطلبات</strong> على الخرائط والتطبيقات والـ services، لكن في المقابل كل ما الطلبات تزيد، لازم <strong>موارد حسابية (computing resources: CPU وRAM)</strong> أكتر، وده بيأثر على تصميم الـ deployment.</p>
@@ -1170,7 +1184,9 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <div class="cards">
 <div class="card"><h4>الناس</h4><p>مين هيدير الـ Windows Server والـ IIS والشهادات والـ backup؟ مين عنده خبرة في Enterprise؟ لو الإجابة "مفيش"، حسّب ده في القرار (راجع <a data-go="agol-vs-enterprise" href="#">صفحة المقارنة مع ArcGIS Online</a>).</p></div>
 <div class="card"><h4>الـ Machines</h4><p>physical (فعلية) ولا virtual (افتراضية) ولا cloud؟ مواصفاتها بتجي من system requirements (متطلبات النظام) الرسمية للـ Enterprise مش من التخمين.</p></div>
-<div class="card"><h4>الميزانية</h4><p>مش بس الـ licenses: السيرفرات، التخزين، الـ backup، الـ monitoring (المراقبة)، وساعات الإدارة. احسب التكلفة الكاملة على سنوات.</p></div>
+<div class="card"><h4>الميزانية</h4><p>مش بس الـ licenses. التكلفة بتشمل كمان:</p>
+<ul><li>السيرفرات</li><li>التخزين</li><li>الـ backup</li><li>الـ monitoring (المراقبة)</li><li>ساعات الإدارة</li></ul>
+<p>احسب التكلفة الكاملة على سنوات.</p></div>
 </div>
 
 <h2 id="pillars">الـ 5 محاور: التقييم بصيغة Blueprint</h2>
@@ -1360,7 +1376,8 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <h2 id="scaling">Scaling: لما الحمل يزيد</h2>
 <p>الصفحة الرسمية بتقول إن مع زيادة المستخدمين والنشاط، ممكن component أو أكتر يحتاج موارد أكتر. وبتحدد حاجة مهمة: أدوات الـ <strong>spatial analysis</strong> بتستهلك <strong>memory وCPU كبيرين</strong> على الـ <strong>hosting server site</strong>. والحل الرسمي لإضافة سعة: <strong>تضيف ArcGIS Server machines للـ hosting server site</strong> (ده horizontal scaling: توسع أفقي بإضافة أجهزة، مقابل vertical: تقوية الجهاز نفسه).</p>
 <div class="callout real"><div class="callout-title">مثال واقعي: البطء الأسبوعي</div>
-<p>كل يوم خميس الفريق بيشغّل buffer وoverlay على طبقات كبيرة، والـ dashboard بتبقى بطيئة لكل الناس. التشخيص: الـ analysis بتاكل موارد الـ hosting server الوحيد. الحلول بالترتيب: (1) جدول الـ analysis في وقت هادي، (2) أضف ArcGIS Server machine للـ hosting site، (3) لو الأنماط دي بقت دائمة، افصل analysis وhosting عن الـ production services في sites منفصلة.</p></div>
+<p>كل يوم خميس الفريق بيشغّل buffer وoverlay على طبقات كبيرة، والـ dashboard بتبقى بطيئة لكل الناس. التشخيص: الـ analysis بتاكل موارد الـ hosting server الوحيد. الحلول بالترتيب:</p>
+<ol><li>جدول الـ analysis في وقت هادي</li><li>أضف ArcGIS Server machine للـ hosting site</li><li>لو الأنماط دي بقت دائمة، افصل analysis وhosting عن الـ production services في sites منفصلة.</li></ol></div>
 <div class="callout note"><div class="callout-title">الخلاصة التخطيطية</div>
 <p>ما تقدّرش تحتاج hardware من صفحة الـ base deployment. الصفحة بتقولك صراحة إن مواصفات الـ machines في صفحة system requirements. وبعد التركيب، راقب الـ CPU والـ memory على الـ hosting server علشان تعرف تكبّر امتى.</p></div>
 
@@ -1413,7 +1430,9 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <tr><td>Multimachine (Portal وServer وData Store منفصلين)</td><td>الـ component اللي على الجهاز</td><td>Portal وقع: مفيش دخول. Server وقع: الخرائط بدون layers. Data Store وقع: الـ hosted layers بس هي اللي بتفشل.</td></tr>
 <tr><td>HA (جهازين لكل component)</td><td>جهاز واحد من نفس النوع</td><td>تقريبًا ولا حاجة لو الـ failover اشتغل، أو توقف قصير أثناء الـ promote.</td></tr>
 </tbody></table></div>
-<p>نقاط الفشل اللي بتتنسي حتى مع HA: <strong>الـ file share، الـ load balancer نفسه، الـ DNS، الشهادة المنتهية، شبكة واحدة بين الـ data centers</strong>. اعمل جرد بيها.</p>
+<p>نقاط الفشل اللي بتتنسي حتى مع HA:</p>
+<ul><li><strong>الـ file share</strong></li><li><strong>الـ load balancer نفسه</strong></li><li><strong>الـ DNS</strong></li><li><strong>الشهادة المنتهية</strong></li><li><strong>شبكة واحدة بين الـ data centers</strong></li></ul>
+<p>اعمل جرد بيها.</p>
 
 <h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
 <div class="tbl-wrap"><table class="tbl">
@@ -1911,7 +1930,10 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <p>فريق الـ IT سمّى الـ VM باسم <code>ARCGIS_PROD1</code> حسب معيار الشركة. التركيب وقف برسالة رفض. الحل اتطلب إعادة تسمية الجهاز وإعادة انضمامه للدومين، يعني ساعات ضايعة. سؤال واحد قبل ما يتسمى الجهاز كان يوفر ده.</p></div>
 
 <h2 id="linux-os">نظام التشغيل على Linux (للمعرفة)</h2>
-<p>دليلنا على Windows، لكن لو الـ client بيستخدم Linux هتحتاج تعرف اللي الصفحة بتقوله: بتدعم RHEL 8 و9، وAlmaLinux 8 و9، وRocky Linux 8 و9، وOracle Linux 8 و9، وSUSE Linux Enterprise Server 15، وUbuntu Server 22.04 و24.04. التركيب بحساب root ممنوع. و<code>/tmp</code> هو مجلد الملفات المؤقتة الافتراضي. وفيه حدود لعدد الملفات المفتوحة (file handles: 65,535) وعدد العمليات (processes: 25,059) لازم تتظبط. الـ Linux مش مدعوم لـ ArcGIS Video Server. وأي نظام تشغيل معدّل (modified binaries) غير مدعوم.</p>
+<p>دليلنا على Windows، لكن لو الـ client بيستخدم Linux هتحتاج تعرف اللي الصفحة بتقوله. الأنظمة المدعومة:</p>
+<ul><li>RHEL 8 و9</li><li>AlmaLinux 8 و9</li><li>Rocky Linux 8 و9</li><li>Oracle Linux 8 و9</li><li>SUSE Linux Enterprise Server 15</li><li>Ubuntu Server 22.04 و24.04</li></ul>
+<p>وملاحظات الـ Linux:</p>
+<ul><li>التركيب بحساب root ممنوع.</li><li><code>/tmp</code> هو مجلد الملفات المؤقتة الافتراضي.</li><li>فيه حدود لازم تتظبط: عدد الملفات المفتوحة (file handles: 65,535) وعدد العمليات (processes: 25,059).</li><li>الـ Linux مش مدعوم لـ ArcGIS Video Server.</li><li>أي نظام تشغيل معدّل (modified binaries) غير مدعوم.</li></ul>
 
 <h2 id="server-reqs">متطلبات ArcGIS Server</h2>
 <div class="tbl-wrap"><table class="tbl">
@@ -1990,7 +2012,11 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <p>(على Linux: 52 GB فاضية للتركيب، و80 GB أو أكتر للإنتاج.)</p>
 
 <h2 id="browsers">المتصفحات</h2>
-<p>الإصدارات الأحدث مُوصى بيها دايمًا. المدعوم حسب الصفحة: Google Chrome 142 فأحدث، Microsoft Edge 142 فأحدث، Mozilla Firefox 146 فأحدث، Firefox 140 ESR، Safari 18 فأحدث. المتصفح لازم يكون <strong>64-bit ومفعّل فيه WebGL2</strong> ومفعّل الـ local storage. <strong>WebGL2</strong> هو تقنية بتخلي المتصفح يستخدم كرت الشاشة (GPU) لرسم الخرائط والـ 3D. و<strong>Local storage</strong> مساحة صغيرة في المتصفح بيخزن فيها التطبيق إعداداته. تفاصيل الـ 3D في <a data-go="scene-viewer" href="#">صفحة Scene Viewer</a>.</p>
+<p>الإصدارات الأحدث مُوصى بيها دايمًا. المدعوم حسب الصفحة:</p>
+<ul><li>Google Chrome 142 فأحدث</li><li>Microsoft Edge 142 فأحدث</li><li>Mozilla Firefox 146 فأحدث</li><li>Firefox 140 ESR</li><li>Safari 18 فأحدث</li></ul>
+<p>المتصفح لازم يكون <strong>64-bit ومفعّل فيه WebGL2</strong> ومفعّل الـ local storage:</p>
+<ul><li><strong>WebGL2</strong> هو تقنية بتخلي المتصفح يستخدم كرت الشاشة (GPU) لرسم الخرائط والـ 3D.</li><li><strong>Local storage</strong> مساحة صغيرة في المتصفح بيخزن فيها التطبيق إعداداته.</li></ul>
+<p> تفاصيل الـ 3D في <a data-go="scene-viewer" href="#">صفحة Scene Viewer</a>.</p>
 
 <h2 id="dns-https">DNS والشهادات والشبكة</h2>
 <div class="cards">
@@ -2460,7 +2486,9 @@ Start-Service -Name $svc</pre>
 <p>لو الـ Data Store على أكتر من جهاز (multimachine)، الـ ports اللي بين الأجهزة لازم تتفتح على <strong>كل</strong> الأجهزة.</p>
 
 <h2 id="others">باقي الـ servers</h2>
-<p>الصفحة الرسمية <strong>ما بتديش أرقام</strong> الـ ports لـ: ArcGIS GeoEvent Server (فيه صفحة لـ Windows وصفحة لـ Linux)، وWorkflow Manager Server، وNotebook Server، وMission Server، وData Pipelines Server، وVideo Server. بتحيل لصفحة كل واحد. قبل ما تكتب أي قاعدة firewall لأي منهم، افتح صفحته. وأنا مش هخترع أرقام ناقصة.</p>
+<p>الصفحة الرسمية <strong>ما بتديش أرقام</strong> الـ ports لـ:</p>
+<ul><li>ArcGIS GeoEvent Server (فيه صفحة لـ Windows وصفحة لـ Linux)</li><li>Workflow Manager Server</li><li>Notebook Server</li><li>Mission Server</li><li>Data Pipelines Server</li><li>Video Server</li></ul>
+<p>بتحيل لصفحة كل واحد. قبل ما تكتب أي قاعدة firewall لأي منهم، افتح صفحته. وأنا مش هخترع أرقام ناقصة.</p>
 
 <h2 id="matrix">مصفوفة التواصل: مين بيكلم مين (Deployment متعدد الأجهزة)</h2>
 <div class="tbl-wrap"><table class="tbl">
@@ -3934,7 +3962,9 @@ Invoke-RestMethod -Uri "https://$($server):6443/arcgis/rest/info/healthCheck?f=j
 <h2 id="cloud">دعم الـ Cloud</h2><p>للـ database services والـ databases المنشورة على cloud: راجع <a data-go="databases-in-cloud" href="#">Requirements for using ArcGIS with databases in the cloud</a>.</p>
 <h2 id="client">البرامج المطلوبة للاتصال</h2>
 <p>الأجهزة (Pro وServer) محتاجة database client من IBM (انظر صفحة Database clients). الـ <strong>IBM Data Server Runtime Client for Db2</strong> متاح من <strong>My Esri</strong> (بوابة Esri لتحميل المنتجات).</p>
-<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ترقية من 11.5.9 لـ 12.1.3</div><p>مؤسسة عندها enterprise geodatabase على Db2 11.5.9 وعايزة branch versioning. من الصفحة: محتاجين Db2 12.1.3. بعد الترقية لازم: (1) تدّي المستخدمين الصلاحيات التلاتة، (2) تحدّث صلاحيات المستخدم sde حسب نموذج الصلاحيات الجديد. من غير دول branch versioning مش هيشتغل.</p></div>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ترقية من 11.5.9 لـ 12.1.3</div><p>مؤسسة عندها enterprise geodatabase على Db2 11.5.9 وعايزة branch versioning. من الصفحة: محتاجين Db2 12.1.3. بعد الترقية لازم:</p>
+<ol><li>تدّي المستخدمين الصلاحيات التلاتة</li><li>تحدّث صلاحيات المستخدم sde حسب نموذج الصلاحيات الجديد.</li></ol>
+<p>من غير دول branch versioning مش هيشتغل.</p></div>
 <div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>لما بتعمل connection لـ Db2 في Pro بتسجل username وpassword. لتسجيل نفس الاتصال مع ArcGIS Server بنفس الطريقة: الـ database authentication اللي بيحفظ بيانات الدخول (حسب صفحة الـ overview هو <strong>المطلوب</strong> للتسجيل).</p></div>
 
 <h2 id="pillars">الـ 5 محاور</h2>
