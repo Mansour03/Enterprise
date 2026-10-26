@@ -327,10 +327,10 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 <h2 id="firewall-dmz">Firewall و DMZ</h2>
 <dl class="defs">
 <dt>Firewall (جدار ناري)</dt><dd>قواعد بتقول: "اسمح بالـ traffic من IP كذا على port كذا، وامنع الباقي". ممكن يكون جهاز مخصص أو برنامج على الـ machine نفسها (Windows Firewall).</dd>
-<dt>DMZ — Demilitarized Zone (المنطقة المنزوعة السلاح)</dt><dd>شبكة وسيطة بين الإنترنت وشبكة الشركة الداخلية. الأجهزة اللي لازم تتكلم مع الإنترنت (زي الـ reverse proxy) بتتحط فيها، علشان لو اخترقت ما توصلش مباشرة للداخل.</dd>
+<dt>DMZ — Demilitarized Zone (المنطقة المنزوعة السلاح)</dt><dd>شبكة وسيطة بين الإنترنت وشبكة الشركة الداخلية. الأجهزة اللي لازم تتكلم مع الإنترنت (زي الـ reverse proxy) بتتحط فيها، علشان لو اتخترقت ما توصلش مباشرة للداخل.</dd>
 </dl>
 <div class="callout real"><div class="callout-title">مثال: خريطة عامة للمواطنين</div>
-<p>جهة عايزة تنشر خريطة مشروع للعامة. الـ web server (IIS مع Web Adaptor) بيتحط في الـ DMZ، والـ firewall الخارجي بيفتح 443 بس. السيرفرات الفعلية (Portal وArcGIS Server) في الشبكة الداخلية، ومفتوح ليهم من الـ DMZ بس. لو اخترق الـ web server، المخترق لسه محتاج يعدّي firewall تاني.</p></div>
+<p>جهة عايزة تنشر خريطة مشروع للعامة. الـ web server (IIS مع Web Adaptor) بيتحط في الـ DMZ، والـ firewall الخارجي بيفتح 443 بس. السيرفرات الفعلية (Portal وArcGIS Server) في الشبكة الداخلية، ومفتوح ليهم من الـ DMZ بس. لو اتخترق الـ web server، المخترق لسه محتاج يعدّي firewall تاني.</p></div>
 
 <h2 id="proxy-lb">Reverse Proxy و Load Balancer</h2>
 <dl class="defs">
@@ -755,7 +755,7 @@ svg .mk{fill:var(--muted)} svg .mkOn{fill:var(--accent)}
 </tbody></table></div>
 <div class="callout real"><div class="callout-title">مثال: لماذا بيفشل النشر بعد ما كان شغال؟</div>
 <p>مدير الشبكة نقل مجلد <code>arcgisserver\<wbr>directories</code> لـ NAS وغيّر صلاحياته، فالحساب <code>arcgis</code> المحلي ما بقاش له صلاحية كتابة. النتيجة: نشر الخدمات بيرجّع "access denied" والـ caches ما بتتكتبش. العلاج الصحيح: حساب domain (أو gMSA) بصلاحية Modify على الـ NAS، مش Administrator.</p></div>
-<div class="callout warn"><div class="callout-title">Least privilege: أقل صلاحيات ممكنة</div><p>متديش حساب الخدمة صلاحيات Domain Admin "علشان تضمن إنه يشتغل". أعطيه Modify على مجلدات التطبيق بس. حساب خدمة بصلاحيات واسعة لو اخترق، المهاجم بياخد نفس الصلاحيات.</p></div>
+<div class="callout warn"><div class="callout-title">Least privilege: أقل صلاحيات ممكنة</div><p>متديش حساب الخدمة صلاحيات Domain Admin "علشان تضمن إنه يشتغل". أعطيه Modify على مجلدات التطبيق بس. حساب خدمة بصلاحيات واسعة لو اتخترق، المهاجم بياخد نفس الصلاحيات.</p></div>
 
 <h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
 <p><strong>Why:</strong> لازم تعرف أنهي داتا فين، لأن ده بيحدد إيه اللي تعمله له backup، وإيه اللي بيبقى بطيء، وإيه اللي بيضيع لو machine وقعت.</p>
@@ -3294,6 +3294,932 @@ Invoke-RestMethod -Uri "https://$($server):6443/arcgis/rest/info/healthCheck?f=j
 <li>كل متطلبات الـ version والـ license والـ shared storage زي نمط الـ Web Adaptor.</li>
 </ul>
 </section>
+<section class="topic" id="t-data-storage-intro" hidden><div class="eyebrow">Data storage</div><h1>Introduction to data storage</h1><p class="subtitle">System storage مقابل User storage</p><p class="lead">أي ArcGIS Enterprise في الآخر <strong>بيخزّن داتا</strong>. الصفحة دي هي الخريطة العامة: الداتا بتتقسم لنوعين رئيسيين، <strong>System storage</strong> (تخزين النظام: اللي ArcGIS نفسه بيديره) و<strong>User storage</strong> (تخزين المستخدم: داتا بتاعتك أنت وبتفضل مكانها وبتتنشر عليها services بالـ reference). فهم التقسيم ده بيحدد إيه اللي لازم تعمله backup له، وإيه اللي مسؤوليتك، وإيه اللي بيتحمّل ضغط على السيرفر.</p>
+
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div>
+<p>في Pro عندك مشروع <code>.aprx</code> وـ geodatabases بتفتحها وتعدّل فيها مباشرة. ده شبه <strong>User storage</strong>: الداتا بتاعتك وأنت اللي مسؤول عنها. أما <strong>System storage</strong> فشبه حاجة Pro بيعملها لنفسه في الخلفية (الـ cache والـ temp والـ settings): مش بتفتحها بإيدك، بتتعامل معاها بس من خلال الـ layer أو الـ service.</p></div>
+
+<h2 id="two-types">النوعين الرئيسيين: System storage vs User storage</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>البند</th><th>System storage (تخزين النظام)</th><th>User storage (تخزين المستخدم)</th></tr></thead>
+<tbody>
+<tr><td>مين بيديره</td><td>ArcGIS نفسه. بتوصله بس عن طريق الـ web service أو الـ layer</td><td>أنت: الداتا موجودة عندك (database أو folder أو cloud)</td></tr>
+<tr><td>الغرض</td><td>يدعم الـ base deployment والـ capabilities الإضافية</td><td>نشر web services بتشاور (reference) على داتا بتاعتك</td></tr>
+<tr><td>التخصصات</td><td>—</td><td>سلوكيات geodatabase المتخصصة زي topology وversioning، وأدوات الطرف التالت تقدر تتصل بيه</td></tr>
+<tr><td>صفحة التفاصيل</td><td>Required system storage وCapability-based system storage</td><td>User storage</td></tr>
+</tbody></table></div>
+
+<h2 id="system">System storage (تخزين النظام)</h2>
+<p><strong>Why:</strong> الـ Portal والـ hosting server محتاجين أماكن يحفظوا فيها حاجات زي الـ hosted feature layers وـ caches وـ video. ArcGIS بيختار نوع المخزن المناسب لكل وظيفة. أنت ما بتفتحش الملفات دي بإيدك؛ بتتعامل مع الـ layer وهو اللي بيتكلم مع المخزن.</p>
+<p>الصفحة بتقسمه لنوعين:</p>
+<ul>
+<li><strong>Required system storage:</strong> اللي بيدعم الـ base deployment.</li>
+<li><strong>Capability-based system storage:</strong> اللي بيدعم قدرات إضافية (زي raster analysis أو knowledge graph).</li>
+</ul>
+<p>أنواع المخازن الخمسة (كل واحد ليه توثيق خاص):</p>
+<ol>
+<li><strong>Relational store</strong> (المخزن العلاقاتي)</li>
+<li><strong>Object store</strong> (مخزن الكائنات)</li>
+<li><strong>Spatiotemporal big data store</strong> (مخزن البيانات الضخمة المكانية-الزمنية)</li>
+<li><strong>Graph store</strong> (مخزن الرسم البياني للعلاقات)</li>
+<li><strong>Raster store</strong> (مخزن الـ raster)</li>
+</ol>
+
+<h3>جدول: إيه الوظيفة اللي بتستخدم أنهي system storage؟</h3>
+<p>الجدول ده بيتحدد مع الـ hosting server (الـ server اللي بيستضيف الـ layers). حسب صفحة Esri:</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الوظيفة (Functionality)</th><th>نوع التخزين (Storage type)</th></tr></thead>
+<tbody>
+<tr><td>نشر hosted feature layers أو إضافة ملفات في Map Viewer</td><td>Relational store</td></tr>
+<tr><td>نشر feature layers أو map image layers بالـ reference من cloud data warehouse، مع snapshots اختيارية</td><td>Relational store</td></tr>
+<tr><td>استخدام أدوات raster analysis (محتاج إعداد raster analysis)</td><td>Raster store. وبعض الأدوات بتنتج hosted feature layers بتتخزن في الـ relational store</td></tr>
+<tr><td>نشر hosted 3D layers من scene layer package أو 3D tiles package أو من ArcGIS Pro</td><td>Object store. وممكن الـ feature layer المصاحب يستخدم الـ relational store</td></tr>
+<tr><td>تفعيل response caching للـ feature layers اللي بتتعدّل نادرًا</td><td>Object store</td></tr>
+<tr><td>تخزين محتوى video layers مع ArcGIS Video Server</td><td>Object store</td></tr>
+<tr><td>استخدام location sharing والتطبيقات المعتمدة عليه (ArcGIS Indoors وArcGIS Field Maps)</td><td>Spatiotemporal big data store</td></tr>
+<tr><td>أرشفة بيانات observations المتدفقة (ArcGIS GeoEvent Server أو ArcGIS Velocity)</td><td>Spatiotemporal big data store</td></tr>
+<tr><td>إنشاء knowledge graph في ArcGIS Pro</td><td>Graph store</td></tr>
+</tbody></table></div>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): من الوظيفة للمخزن</div>
+<p>فريق الصيانة عمل في Field Maps تتبع لمواقع الفرق الميدانية (location sharing). الخريطة بتتحدث كل ثواني، والفريق بيشتكي إن الـ Portal بقى تقيل. بالجدول: location sharing بيتخزن في الـ <strong>spatiotemporal big data store</strong> مش في الـ relational store. يعني المشكلة غالبًا في موارد الجهاز اللي عليه الـ spatiotemporal store (الصفحة 18 بتقول إنه محتاج disk وذاكرة كبيرين)، مش في الـ relational store بتاع الـ hosted layers.</p></div>
+
+<h2 id="user">User storage (تخزين المستخدم)</h2>
+<p><strong>Why:</strong> مش دايمًا عايز تنسخ الداتا جوه ArcGIS. لو عندك enterprise geodatabase بتتحدث يوميًا من فرق تانية، تنسخها معناه نسختين مختلفتين. الحل: تنشر service بتشاور على الداتا في مكانها (referenced). الـ User storage هو المكان ده.</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الوظيفة (مثال)</th><th>نوع User storage</th></tr></thead>
+<tbody>
+<tr><td>نشر feature layers أو map image layers بالـ reference من enterprise geodatabase</td><td>Relational database</td></tr>
+<tr><td>نشر feature layers أو map image layers بالـ reference من cloud data warehouse باستخدام ArcGIS Pro</td><td>Cloud data warehouse</td></tr>
+<tr><td>نشر map image layer بتشاور على datasets في folder أو network share</td><td>Folder</td></tr>
+<tr><td>نشر imagery layer من mosaic dataset في file geodatabase بتشاور على raster مخزن في الـ cloud</td><td>Folder (file geodatabase) + cloud store (الصور المصدر)</td></tr>
+</tbody></table></div>
+<p>التفاصيل الكاملة في صفحة <a data-go="user-storage" href="#">User storage</a>.</p>
+
+<h2 id="pillars">الـ 5 محاور: تخزين الداتا (نظرة عامة)</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p><strong>Why:</strong> كل مخزن بيتكلم مع الـ hosting server على ports مختلفة، وده بيفرق وقت ما تحط كل مخزن على جهاز لوحده.</p>
+<ul>
+<li>الـ ports الداخلية للمخازن (من صفحة ports): relational: <code>9876</code> وغيره، object: <code>29879</code> و<code>19879</code> وغيره، spatiotemporal: <code>9220</code> و<code>9320</code>، graph: <code>9829</code> و<code>9828</code> و<code>9830</code> و<code>9831</code>. التفاصيل في <a data-go="ports" href="#">صفحة الـ ports</a>.</li>
+<li>الـ user storage بيتكلم عبر شبكة المؤسسة: ports الـ database (يعني حسب نوع الـ DBMS) أو SMB للـ shares أو HTTPS للـ cloud. الصفحة ما بتحددش أرقام ports هنا؛ دي بتتحدد من توثيق الـ DBMS أو الـ cloud provider.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>الـ system storage بيتعمل بحسابات الخدمة بتاعت ArcGIS Data Store وـ ArcGIS Server، مش بحساب مستخدم.</li>
+<li>الـ user storage بيتسجل بحساب لازم يكون له صلاحية قراءة (وكتابة لو feature service) على الـ database أو الـ folder: ده الـ credentials اللي بتدخله وقت التسجيل.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>مسار النشر: المستخدم ينشر layer → الـ Portal يوجه الطلب للـ hosting server → الـ hosting server يكتب في المخزن المناسب من الجدول فوق (system) أو يسجل reference لداتا موجودة (user). الاختلاف الجوهري: نشر hosted = <strong>نسخ</strong> الداتا للمخزن، نشر referenced = <strong>مؤشر</strong> للداتا في مكانها.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead>
+<tbody>
+<tr><td>النشر بيفشل لنوع معين من الـ layers</td><td>المخزن المطلوب للوظيفة دي مش متكوّن (مثلاً مفيش object store لـ 3D)</td><td>راجع الجدول فوق وتأكد إن المخزن المناسب متكوّن مع الـ hosting server</td></tr>
+<tr><td>Referenced layer مش بتفتح</td><td>الـ database أو الـ folder اتحرك أو بيانات الاتصال اتغيرت</td><td>راجع تسجيل الـ data store</td></tr>
+<tr><td>Hosted layers اتفقدت بعد عطل</td><td>مفيش backup للـ system storage</td><td>راجع <a data-go="required-storage" href="#">Required system storage</a> (قسم Back up storage)</td></tr>
+</tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul>
+<li>اعرف لكل وظيفة هتستخدمها أنهي مخزن بيدعمها <strong>قبل</strong> ما تصمم الأجهزة.</li>
+<li>الداتا اللي بتتحدث من مصدر تاني: خليها referenced بدل ما تنسخها.</li>
+<li>الـ system storage محتاج backup؛ الـ user storage بيتعمل له backup من عند صاحبه (الـ DBA مثلاً).</li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/introduction-to-data-storage.html" target="_blank" rel="noopener">Introduction to data storage</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>الداتا نوعين: System storage (ArcGIS بيديره) وUser storage (بتاعك).</li>
+<li>5 مخازن نظام: relational وobject وspatiotemporal big data وgraph وraster، وكل وظيفة مربوطة بواحد منهم.</li>
+<li>User storage بيدعم نشر services بالـ reference من databases وfolders وcloud data warehouses وcloud stores.</li>
+</ul>
+</section>
+<section class="topic" id="t-required-storage" hidden><div class="eyebrow">Data storage</div><h1>Required system storage</h1><p class="subtitle">المخازن المطلوبة للـ base deployment والـ backup</p><p class="lead">الـ <strong>Required system storage</strong> هو التخزين اللي أي <strong>base deployment</strong> لازم يتوفر له عشان يشتغل. ArcGIS بيديره، وأنت بتتعامل معاه عن طريق الـ web service أو الـ layer. التخزين ده ممكن يكون على disks محلية أو network shares، في الـ on-premises والـ cloud، والـ cloud deployments تقدر كمان تستخدم cloud services لبعضه. لو محتاج قدرات زيادة فيه storage إضافي في <a data-go="capability-storage" href="#">Capability-based system storage</a>.</p>
+
+<h2 id="relational">Relational store (المخزن العلاقاتي)</h2>
+<p><strong>Why:</strong> الـ hosted feature layers (الطبقات اللي بتترفع على Portal وتتخزن جواه) محتاجة database حقيقية. الـ relational store هو الـ database اللي الـ hosting server بيستخدمها لده ولحاجات تانية.</p>
+<ul>
+<li>بتركّب وتكوّن <strong>ArcGIS Data Store</strong> للـ relational store.</li>
+<li>بيتنشر <strong>دايمًا</strong> بنمط <strong>primary-standby</strong> (جهاز أساسي وجهاز احتياطي)، على جهاز واحد أو اتنين.</li>
+</ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ليه اتنين مش تلاتة</div>
+<p>فريق بيحاول يعمل relational store على 3 أجهزة "للأمان" زي ما بيعمل في الـ object store. الصفحة واضحة: الـ relational store دايمًا primary-standby، يعني جهاز واحد (من غير standby) أو اتنين، مش cluster. التلاتة مش خيار.</p></div>
+
+<h2 id="object">Object store (مخزن الكائنات)</h2>
+<p><strong>Why:</strong> الـ hosting server بيستخدمه لـ caches الـ hosted 3D layers وـ cached query responses وحاجات تانية. ده مخزن للكائنات الكبيرة، مش لجداول.</p>
+<ul>
+<li>ArcGIS Data Store تقدر تقدمه على جهاز واحد أو في <strong>cluster mode</strong> (مجموعة أجهزة).</li>
+<li>في deployments على AWS أو Azure، تقدر تستخدم cloud storage service كـ object store:
+  <ul><li>Amazon S3</li><li>Azure Blob Storage</li></ul></li>
+<li>لو الـ deployment اتعمل بأدوات Esri للـ cloud: فيه أدلة إعداد لـ AWS وAzure (مذكورة في المراجع تحت).</li>
+<li>لو الـ deployment على AWS أو Azure من غير أدوات Esri: الصفحة بتحيل لمرجعين: <strong>ArcGIS API for Python</strong> (sample اسمه add-object-store-to-server) وـ <strong>ArcGIS REST API</strong> (العملية registerdataitem للـ object store).</li>
+</ul>
+
+<h2 id="additional">Additional system stores (مخازن نظام إضافية)</h2>
+<p>لما بتكوّن الـ relational store، ArcGIS بيركّب ويكوّن <strong>تلقائيًا</strong> مخزنين إضافيين:</p>
+<ul>
+<li><strong>Queue store:</strong> بيدعم الـ <strong>webhooks</strong> (إشعار HTTP بيبعته النظام لتطبيق تاني لما يحصل حدث، زي تعديل feature).</li>
+<li><strong>In-memory cache store:</strong> بيحتفظ بـ <strong>last edit date</strong> (تاريخ آخر تعديل) للـ hosted feature layers، عشان يدعم الـ <strong>query response caching</strong> (تخزين نتايج الاستعلام مؤقتًا).</li>
+</ul>
+
+<h2 id="system-directories">System directories (مجلدات النظام)</h2>
+<p>المجلدات دي بتخزن معلومات كل مكوّن محتاجها:</p>
+<ul>
+<li><strong>Portal content directory:</strong> مطلوب لـ Portal for ArcGIS. بيخزن المحتوى اللي المستخدمين بيحفظوه ويرفعوه.</li>
+<li><strong>Configuration store:</strong> مطلوب لـ ArcGIS Server. بيخزن الخصائص الأساسية للـ site، منها الـ machines والـ clusters.</li>
+<li><strong>Server directories:</strong> مطلوبة لـ ArcGIS Server. بتخزن tile caches وملفات الـ geoprocessing والـ output المؤقت والملفات المرفوعة ومعلومات الاتصال بالـ services والـ databases.</li>
+</ul>
+<p>توصيات التخزين في الـ on-premises والـ cloud في <a data-go="system-directories" href="#">Options for system directories</a>.</p>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div>
+<p>الـ <strong>configuration store</strong> زي ملف الـ <code>.aprx</code> بتاع الـ site: لو راح، الـ site نفسه مش بيعرف إيه الـ machines والـ services اللي عنده. والـ <strong>server directories</strong> زي مجلد الـ scratch والـ cache اللي Pro بيستخدمه لكن مشترك بين كل الـ machines.</p></div>
+
+<h2 id="backup">Back up storage (النسخ الاحتياطي)</h2>
+<p><strong>Why:</strong> لو الـ backup على نفس الجهاز اللي وقع، يبقى ضاع مع الجهاز. فالصفحة بتوصي إن الـ backups يكون ليها مكان تخزين، <strong>يفضّل يكون منفصل</strong> عن الأجهزة اللي بتشغّل ArcGIS Enterprise، عشان يفضل متاح لو النظام وقع.</p>
+<ul>
+<li>الـ backups تتحط في local folder أو network share، أو في cloud service. الـ cloud services scalable وresilient، وده بيمنع الـ backups من إنها تملّا الـ disk وبيحميك من فقدان الداتا.</li>
+<li>أداة الـ backup بتاعت <strong>Portal for ArcGIS</strong> وأداة <code>backupdatastore</code> بتاعت <strong>ArcGIS Data Store</strong> الاتنين تقدروا يكتبوا <strong>مباشرة</strong> على Amazon S3 وAzure Blob Storage.</li>
+<li>الـ backup والـ restore بياخدوا وقت أطول لما الـ deployment ومكان الـ cloud backup storage في <strong>regions مختلفة</strong>.</li>
+</ul>
+<div class="callout tip"><div class="callout-title">Tip من Esri</div>
+<p>تقدر تكتب الـ backups على drive محلي الأول وبعدين تنسخها لـ cloud storage. ده بيقلل وقت الـ backup وبيسمح لك تستخدم cloud options مش بتدعم الكتابة المباشرة.</p></div>
+
+<h2 id="pillars">الـ 5 محاور: Required system storage</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<ul>
+<li>الـ hosting server بيكلّم الـ relational store عبر ports الـ Data Store (من صفحة ports: <code>9876</code> وباقي الـ ports، و<code>2443</code> للـ Data Store كله، و<code>6443</code> outbound ناحية الـ server).</li>
+<li>الـ object store: <code>29879</code> و<code>19879</code> وباقي ports الـ cluster (قائمة كاملة في <a data-go="ports" href="#">صفحة الـ ports</a>).</li>
+<li>لو الـ object store في S3 أو Blob، الاتصال خارجي عبر HTTPS، فلازم الـ firewall يسمح بالخروج.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>الـ Data Store بيشتغل بحساب خدمة بتحدده وقت التركيب؛ نفس الحساب بيمتلك ملفات المخزن على الـ disk.</li>
+<li>الـ Portal content directory والـ server directories والـ configuration store: الحساب اللي بيشغّل الـ Portal أو الـ Server لازم يقدر يكتب عليها (خصوصًا لو network share). ده مذكور في صفحة الـ deployment scenarios.</li>
+<li>للـ backup على S3 أو Blob: الأداة محتاجة credentials للـ cloud account؛ الصفحة ما بتفصّلهاش هنا.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>المخزن</th><th>بيخدم</th><th>خيارات النشر (حسب الصفحة)</th></tr></thead>
+<tbody>
+<tr><td>Relational store</td><td>hosted feature layers وغيرها</td><td>ArcGIS Data Store، primary-standby، جهاز أو اتنين</td></tr>
+<tr><td>Object store</td><td>caches الـ hosted 3D layers وـ cached query responses</td><td>Data Store على جهاز أو cluster، أو S3 / Azure Blob</td></tr>
+<tr><td>Queue store</td><td>webhooks</td><td>بيتكوّن تلقائيًا مع الـ relational store</td></tr>
+<tr><td>In-memory cache store</td><td>last edit date للـ query response caching</td><td>بيتكوّن تلقائيًا مع الـ relational store</td></tr>
+<tr><td>Portal content directory</td><td>محتوى المستخدمين</td><td>انظر <a data-go="system-directories" href="#">Options for system directories</a></td></tr>
+<tr><td>Configuration store وServer directories</td><td>إعدادات الـ site وـ caches وـ geoprocessing</td><td>نفس الصفحة</td></tr>
+</tbody></table></div>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead>
+<tbody>
+<tr><td>الـ hosted feature layers كلها وقعت</td><td>الـ relational store وقع وما فيش standby</td><td>اجعله primary-standby (جهازين) بدل جهاز واحد</td></tr>
+<tr><td>نشر hosted 3D layers فشل</td><td>الـ object store مش متكوّن أو مش متاح</td><td>تأكد من الـ object store وـ ports الـ cluster</td></tr>
+<tr><td>الـ site مش بيقوم</td><td>الـ configuration store مش متاح</td><td>تأكد من الـ share أو الـ bucket</td></tr>
+<tr><td>الـ backup أو الـ restore بطيء</td><td>الـ cloud backup storage في region مختلف</td><td>خلي الـ backup storage في نفس region الـ deployment</td></tr>
+<tr><td>الـ backup ملّى الـ disk</td><td>الـ backups على نفس الجهاز</td><td>انقلها لـ network share أو cloud service</td></tr>
+</tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul>
+<li>الـ backups في مكان <strong>منفصل</strong> عن أجهزة ArcGIS Enterprise.</li>
+<li>الـ cloud services للـ backups أفضل من الـ disks المحلية من ناحية الـ scalability والـ resilience (حسب الصفحة).</li>
+<li>لو الأداة مش بتدعم الكتابة المباشرة على الـ cloud: اكتب محليًا وانسخ بعدين.</li>
+<li>الـ relational store: primary-standby دايمًا (جهازين لو الـ HA مطلوب).</li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/required-system-storage.html" target="_blank" rel="noopener">Required system storage</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/deploy/install-data-store.html" target="_blank" rel="noopener">Install ArcGIS Data Store</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/deploy/data-store-deployment-modes.html" target="_blank" rel="noopener">Data store deployment modes</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/deploy/configure-object-store-aws.html" target="_blank" rel="noopener">Configure object store on AWS</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/administer/overview-backup-restore-web-gis.html" target="_blank" rel="noopener">Backup and restore overview</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/administer/data-store-utility-reference.html" target="_blank" rel="noopener">Data store utility reference</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>Relational store = ArcGIS Data Store بنمط primary-standby (جهاز أو اتنين).</li>
+<li>Object store = Data Store (جهاز أو cluster) أو S3 أو Azure Blob.</li>
+<li>الـ queue store وـ in-memory cache store بيتكوّنوا تلقائيًا مع الـ relational store.</li>
+<li>ثلاث system directories: portal content directory وconfiguration store وserver directories.</li>
+<li>الـ backups في مكان منفصل، ويقدروا يتكتبوا مباشرة على S3 وAzure Blob.</li>
+</ul>
+</section>
+<section class="topic" id="t-capability-storage" hidden><div class="eyebrow">Data storage</div><h1>Capability-based system storage</h1><p class="subtitle">Graph وRaster وSpatiotemporal stores</p><p class="lead">فيه قدرات في ArcGIS Enterprise بتحتاج تخزين <strong>زيادة عن الحد الأدنى للـ base deployment</strong>. الصفحة دي بتغطي التلات مخازن اللي بتتضاف حسب القدرة اللي أنت مفعّلها: <strong>Graph store</strong> وـ <strong>Raster store</strong> وـ <strong>Spatiotemporal big data store</strong>.</p>
+
+<h2 id="graph">1. Graph store (مخزن الرسم البياني)</h2>
+<p><strong>Why:</strong> الـ knowledge graph (رسم بياني بيربط كيانات وعلاقات: مثلاً قطعة أرض ← مالكها ← عقد ← مشروع) محتاج قاعدة بيانات مصممة للعلاقات، مش جداول عادية.</p>
+<ul>
+<li>بيستخدمه <strong>ArcGIS Knowledge Server</strong> لحفظ معلومات النظام الخاصة بالـ knowledge graph، وللكيانات (entities) والعلاقات (relationships) في الـ hosted knowledge graphs.</li>
+<li>في الـ on-premises والـ cloud، <strong>ArcGIS Data Store</strong> هو اللي بيوفره.</li>
+<li>بيستهلك موارد كتير: <strong>محتاج كميات كبيرة من الذاكرة (memory) ومساحة disk</strong>.</li>
+<li>كوّنه على <strong>جهاز واحد أو تلات أجهزة</strong>، ومنفصلين عن الـ data stores التانية.</li>
+</ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ليه الجهاز منفصل</div>
+<p>شخص كوّن الـ graph store على نفس الجهاز اللي عليه الـ relational store توفيرًا للتكلفة. أول ما فريق بدأ يبني knowledge graph كبير، الجهاز استهلك الذاكرة كلها، والـ hosted feature layers بقت بطيئة. الصفحة بتقول بالنص إنه يتكوّن على أجهزة منفصلة عن باقي الـ data stores.</p></div>
+<p><strong>ملحوظة عن الأعداد:</strong> الصفحة بتقول "جهاز واحد أو تلاتة". مش اتنين. ما بتذكرش رقم الـ memory أو الـ disk بالتحديد هنا؛ ارجع لتوثيق ArcGIS Knowledge Server وـ system requirements.</p>
+
+<h2 id="raster">2. Raster store (مخزن الـ raster)</h2>
+<p><strong>Why:</strong> الـ imagery (صور جوية، DEM، صور أقمار صناعية) ملفاتها ضخمة ومش بتتخزن في database. محتاجة مكان ملفات (folder أو cloud).</p>
+<ul>
+<li>بيستخدمه <strong>ArcGIS Image Server</strong> للـ hosted imagery layers، زي اللي بتجي من رفع imagery مباشر أو من أدوات الـ raster analysis.</li>
+<li>بتسجله في <strong>Server Manager</strong> (واجهة الإدارة بتاعت ArcGIS Server).</li>
+<li>ممكن يكون <strong>folder محلي</strong> على جهاز ArcGIS Server أو <strong>network share</strong>:
+  <ul>
+  <li>الـ local folders أسرع، لكن بتبقى غير متاحة لو الجهاز بتاعها وقع.</li>
+  <li>الـ network shares <strong>مُوصى بيها</strong> للـ sites متعددة الأجهزة.</li>
+  </ul></li>
+<li>الـ cloud storage خيار بعد ما تسجل المكان كـ <strong>cloud store</strong>: Amazon S3، Azure Blob Storage، Google Cloud Storage، وAlibaba Cloud Object Storage Service (OSS).</li>
+</ul>
+<div class="callout warn"><div class="callout-title">ملحوظة من Esri</div>
+<p>الـ on-premises deployments تقدر تستخدم cloud raster stores، لكن الأفضل <strong>network share على الشبكة المحلية</strong> عشان تقلل الـ latency (زمن التأخير).</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div>
+<p>في Pro بتشتغل على raster من folder أو mosaic dataset على جهازك. هنا نفس الفكرة لكن الـ folder لازم يكون <strong>مرئي لكل أجهزة الـ site</strong>، فالـ network share بيكون الحل لما يبقى عندك أكتر من جهاز.</p></div>
+
+<h2 id="spatiotemporal">3. Spatiotemporal big data store (مخزن البيانات الضخمة المكانية-الزمنية)</h2>
+<p><strong>Why:</strong> داتا زي مواقع مركبات بتتحدث كل ثانية أو قراءات حساسات محتاجة تخزين سريع الكتابة وبحث على المكان والزمن، وده مش شغل relational store.</p>
+<ul>
+<li>مخزن <strong>موزّع (distributed) وقابل للتوسع (scalable)</strong> مع بحث نصي كامل (full-text search) للداتا اللي فيها مكوّن مكاني وزمني.</li>
+<li><strong>مطلوب</strong> لقدرة الـ <strong>location sharing</strong>، وممكن كمان يخزن feature data لـ <strong>GeoEvent Server</strong> وـ <strong>Velocity Server</strong>.</li>
+<li>في الـ on-premises والـ cloud، ArcGIS Data Store هو اللي بيوفره.</li>
+<li>ممكن يشتغل كـ <strong>cluster</strong> على أجهزة متعددة بأدوار مختلفة:
+  <ul>
+  <li><strong>Coordinator:</strong> بيتحكم في توزيع الداتا. الـ cluster محتاج <strong>عدد فردي (odd number)</strong> من أجهزة الـ coordinator.</li>
+  <li><strong>Data:</strong> بيخزن الـ feature data.</li>
+  </ul></li>
+<li>محتاج كميات كبيرة من الـ disk والـ memory، فشغّله على <strong>أجهزة منفصلة</strong> عن الـ data stores التانية.</li>
+</ul>
+<div class="callout tip"><div class="callout-title">ليه العدد فردي؟</div>
+<p>هي قاعدة عامة في الـ clusters (اقتراح شرح منا، مش من الصفحة): لما أجهزة التنسيق بتختلف في الرأي، لازم أغلبية تحسم. لو العدد زوجي ممكن يحصل تعادل ومفيش أغلبية. فالصفحة بتشترط فردي (1 أو 3 أو 5...).</p></div>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): تتبع الفرق الميدانية</div>
+<p>شركة عايزة تتبع مركبات الصيانة لحظيًا بـ Field Maps. بتفعّل location sharing، فبتحتاج spatiotemporal big data store. تبدأ بجهاز واحد، ولما العدد يزيد تتوسع لـ cluster: 3 coordinators + عدد من الـ data machines.</p></div>
+
+<h2 id="pillars">الـ 5 محاور: Capability-based storage</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<ul>
+<li>Spatiotemporal: <code>9220</code> و<code>9320</code> (من صفحة ports).</li>
+<li>Graph: <code>9829</code> و<code>9828</code> و<code>9830</code> و<code>9831</code>.</li>
+<li>Raster store: مفيش ports خاصة؛ هو folder أو share أو cloud، فبيتكلم عبر SMB أو HTTPS.</li>
+<li>لو الـ firewall بيحجب ports الـ cluster بين أجهزة الـ spatiotemporal، الـ coordinators والـ data machines مش بيشوفوا بعض.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>الـ Raster store على share: حساب ArcGIS Server لازم يقدر يكتب ويقرأ.</li>
+<li>Graph وSpatiotemporal: بيتشغلوا كجزء من ArcGIS Data Store بحساب الخدمة بتاعه.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>المخزن</th><th>العميل</th><th>المكان</th><th>الأجهزة</th></tr></thead>
+<tbody>
+<tr><td>Graph store</td><td>ArcGIS Knowledge Server</td><td>ArcGIS Data Store</td><td>1 أو 3، منفصلة</td></tr>
+<tr><td>Raster store</td><td>ArcGIS Image Server</td><td>Folder محلي أو network share أو cloud store</td><td>—</td></tr>
+<tr><td>Spatiotemporal big data store</td><td>location sharing، GeoEvent Server، Velocity</td><td>ArcGIS Data Store</td><td>جهاز أو cluster (coordinators فردي + data)، منفصلة</td></tr>
+</tbody></table></div>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead>
+<tbody>
+<tr><td>الـ imagery بتختفي لما جهاز وقع</td><td>الـ raster store على local folder في الجهاز ده</td><td>انقله لـ network share</td></tr>
+<tr><td>الـ imagery بطيئة من cloud store على site محلي</td><td>latency</td><td>استخدم network share محلي</td></tr>
+<tr><td>الـ spatiotemporal cluster مش بيستقر</td><td>عدد coordinators زوجي أو ports محجوبة</td><td>خليه فردي وافتح الـ ports</td></tr>
+<tr><td>باقي الـ data stores بطيئة</td><td>graph أو spatiotemporal على نفس الجهاز</td><td>افصلهم على أجهزة لوحدهم</td></tr>
+</tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul>
+<li>Graph وSpatiotemporal: أجهزة <strong>منفصلة</strong> وموارد كبيرة.</li>
+<li>Raster: network share للـ multi-machine، وlocal folder أسرع لكن نقطة فشل.</li>
+<li>On-premises: network share أفضل من cloud raster store لتقليل الـ latency.</li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/capability-based-system-storage.html" target="_blank" rel="noopener">Capability-based system storage</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>Graph store: Knowledge Server، 1 أو 3 أجهزة منفصلة، موارد كبيرة.</li>
+<li>Raster store: Image Server، folder أو network share (موصى بيه للـ multi-machine) أو cloud (S3، Blob، Google Cloud Storage، Alibaba OSS).</li>
+<li>Spatiotemporal: مطلوب لـ location sharing، coordinators بعدد فردي، أجهزة منفصلة.</li>
+</ul>
+</section>
+<section class="topic" id="t-user-storage" hidden><div class="eyebrow">Data storage</div><h1>User storage</h1><p class="subtitle">databases وfolders وcloud stores</p><p class="lead">الـ <strong>User storage</strong> هو الداتا اللي أنت بتحتفظ بيها في مكانها (databases، folders، cloud) وبتنشر عليها <strong>referenced web services</strong>: يعني الـ service بتشاور على الداتا بدل ما ArcGIS ينسخها. في الـ cloud deployments فيه خيارات أكتر: cloud storage وـ managed database services وـ cloud data warehouses. الخيارات المتاحة بتختلف حسب نوع الـ service وبيئة الـ deployment.</p>
+
+<h2 id="register">تسجيل الـ data stores: 3 طرق</h2>
+<ol class="steps">
+<li><strong>إضافة data store item في المؤسسة</strong><p>من الـ Portal (Add data store item).</p></li>
+<li><strong>من ArcGIS Pro</strong><p>تسجيل الداتا مع ArcGIS Server من Pro.</p></li>
+<li><strong>من Server Manager مباشرة</strong><p>على الـ ArcGIS Server site.</p></li>
+</ol>
+
+<h2 id="databases">Databases (قواعد البيانات)</h2>
+<p>تقدر تسجل database مع ArcGIS Server عشان تنشر services بتشاور على داتاها: سواء database بتديرها بنفسك، أو cloud database service، أو cloud data warehouse.</p>
+<h3>Databases you install and maintain (قواعد بتركّبها وتصينها بنفسك)</h3>
+<p>بتنطبق على الـ on-premises والـ cloud. فيه أنظمة database متوافقة كتير، وليها متطلبات مختلفة: راجع <strong>Supported databases and data warehouses</strong>.</p>
+<h3>Database services (DBaaS: قواعد كخدمة)</h3>
+<p><strong>DBaaS</strong> = <strong>D</strong>ata<strong>b</strong>ases <strong>a</strong>s <strong>a</strong> <strong>S</strong>ervice. مزودو الـ cloud بيقدموا database جاهزة، فمش محتاج تركّب أو تحدّث أو تصين البرنامج والأجهزة. ArcGIS بيدعم تخزين الـ <strong>enterprise geodatabases</strong> فيها، وده بديل لتشغيل RDBMS (زي Microsoft SQL Server أو Oracle أو PostgreSQL) على VM في الـ cloud. متطلبات الـ DBaaS المدعومة في صفحة <strong>Requirements for using ArcGIS with databases in the cloud</strong>.</p>
+<h3>Cloud data warehouses (مخازن بيانات سحابية)</h3>
+<p>خدمات تخزين مُدارة وscalable وresilient وسريعة، مناسبة لأحمال التحليل الكبيرة. ArcGIS Enterprise بيدعم عرض وتحليل داتا من cloud data warehouses.</p>
+
+<h2 id="folders">Folders (المجلدات)</h2>
+<p>تقدر تسجل folders فيها موارد GIS (زي imagery) في الـ on-premises والـ cloud. الـ folder ممكن يكون <strong>محلي</strong> على جهاز ArcGIS Server أو على <strong>network share</strong>. المحلي أسرع لكن بيبقى غير متاح لو الجهاز وقع. الـ network shares مُوصى بيها للـ sites متعددة الأجهزة.</p>
+
+<h2 id="cloud-stores">Cloud stores (مخازن السحابة)</h2>
+<p>الـ cloud storage ممكن يخزن داتا وـ caches للـ referenced web layers. أنواع الـ layers والـ storage services المدعومة بتختلف حسب الـ workflow. تقدر تسجل الـ cloud stores مع ArcGIS Server وتستخدمها في:</p>
+<ol>
+<li><strong>تخزين prerendered cached tiles</strong> لـ map أو image services: الـ cloud data stores ممكن تكون مجلد الـ cache بدل الـ local file system. (الروابط: What is map caching، وCaches in the cloud).</li>
+<li><strong>تخزين prerendered caches</strong> للـ tile وvector tile و3D tiles وscene layers: الـ caches بتتعمل في مكان الـ cloud، والـ services بتتنشر مباشرة من الـ data store item. ده بيوفر وقت وموارد سيرفر مقارنة بنسخ الداتا من ArcGIS Pro.</li>
+<li><strong>تخزين ملفات raster وimage</strong> للـ referenced imagery layers: مدعوم لما ArcGIS Enterprise متكوّن لـ image hosting أو raster analysis. (الرابط: Web image layer).</li>
+</ol>
+
+<h2 id="latency">Latency considerations: اعتبارات التأخير مع الـ cloud</h2>
+<p><strong>Why:</strong> كل مرة الـ service بتقرأ من مكان بعيد، الوقت بيزيد بسبب المسافة.</p>
+<ul>
+<li>الداتا المستضافة في cloud ممكن تضيف latency. مثال الصفحة: cloud data warehouse في region أمريكي يستخدمه site on-premises في أستراليا، فهتتبطئ الـ responses.</li>
+<li>تحط كل المكونات في <strong>نفس region عند نفس مزود الـ cloud</strong> بيقلل الـ latency. مثال: imagery في AWS af-south-1 تستخدمها مكونات ArcGIS Enterprise في نفس الـ region. والـ clients زي ArcGIS Pro يفضّل كمان يكونوا في نفس المكان.</li>
+</ul>
+<div class="callout danger"><div class="callout-title">ملحوظة من Esri (مهمة للدعم)</div>
+<p>Esri <strong>لا تدعم رسميًا</strong> الاتصال بـ cloud services للداتا المرجعية (referenced data) لما مكونات ArcGIS Enterprise <strong>مش في نفس الـ region عند نفس الـ cloud</strong>. يعني ممكن تشتغل، لكن لو حصلت مشكلة مش هتتعامل كـ supported configuration.</p></div>
+
+<h2 id="publishing">Database considerations for publishing services: اعتبارات النشر</h2>
+<p>لما بتنشر ArcGIS Server site لازم تقرر فين الداتا المصدر للـ web services. الجزء ده بيغطي إمتى تستخدم enterprise geodatabase وإمتى file geodatabase.</p>
+<h3>إمتى enterprise geodatabase ومتى file geodatabase؟</h3>
+<ul>
+<li><strong>الـ enterprise geodatabase مُوصى بيه عمومًا</strong> كمصدر للـ map وfeature services: لـ high availability وbackup وrecovery وconcurrency (تعدد المستخدمين) وscalability وthroughput. ده بافتراض إن عندك <strong>DBA</strong> (Database Administrator) مخصص.</li>
+<li>من غير DBA وداتا ثابتة نسبيًا: الـ <strong>file geodatabase</strong> بديل كويس، وغالبًا بيشتغل بكفاءة من غير tuning. الـ enterprise database من غير tuning ممكن يبقى أبطأ.</li>
+<li>للـ map وglobe caching بطلبات قراءة كتير وسريعة: الـ file geodatabases المحلية غالبًا أسرع من الـ enterprise.</li>
+<li>الـ file geodatabases ناقصها: versioning، وgeodatabase replication، وhistorical archiving، وlogging، وbackup وrecovery، وfailover.</li>
+</ul>
+<h3>اعتبارات الـ file geodatabases</h3>
+<ul>
+<li>كل جهاز ArcGIS Server يكون عنده <strong>نسخة مطابقة خاصة</strong> بيه من الـ file geodatabase. <strong>ما تضبطش الـ site على file geodatabase واحدة عبر الشبكة</strong>. ده بيقلل traffic الشبكة وتنافس الـ disk I/O.</li>
+<li>الـ file geodatabases <strong>read-only</strong> بالنسبة لـ ArcGIS Server، فالـ feature services مش بتشاور عليها.</li>
+<li>لما الـ file geodatabase تكون publication geodatabase في one-way replication، الـ synchronization لازم يحصل وقت عدم النشاط. لتحريرها: أوقف الـ service أو شيل الأجهزة مؤقتًا من الـ site.</li>
+<li>ArcGIS Server <strong>مش قادر يعطّل schema locking</strong> على الـ file geodatabases.</li>
+</ul>
+<h3>File geodatabases والـ map caching</h3>
+<ul>
+<li>الـ file geodatabases ممتازة للـ caching: نسخ مطابقة على كل جهاز caching بتقلل النداءات على الـ enterprise geodatabase وتخفف حمل الـ database.</li>
+<li>الـ one-way replication من enterprise geodatabase ممكن ينشئ الـ file geodatabases دي، بما فيها بنظام الإسقاط (projection) بتاع الـ cached map. مثال الصفحة: الـ caching بـ WGS 1984 Web Mercator (Auxiliary Sphere) شائع، لكن الإسقاط ده مش بيتوصى بيه عادةً لتخزين الـ enterprise.</li>
+</ul>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro (شغلك في الـ stormwater والـ FTTH)</div>
+<p>شبكة الصرف أو الألياف اللي بتتعدّل يوميًا من فرق متعددة: <strong>enterprise geodatabase</strong> بـ versioning هي الخيار. أما طبقة خلفية ثابتة (حدود أحياء) بتتعمل لها cache: <strong>file geodatabase</strong> محلية على كل جهاز أسرع وأبسط.</p></div>
+
+<h2 id="pillars">الـ 5 محاور: User storage</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<ul>
+<li>الـ database: port الـ DBMS (حسب النوع؛ الصفحة ما بتحددش أرقام).</li>
+<li>الـ network share: SMB (حسب إعداد المؤسسة).</li>
+<li>الـ cloud stores: HTTPS خارجي، فلازم الـ firewall يسمح بالخروج.</li>
+<li>الـ latency قيد: خلّي الـ cloud data في نفس region مكونات ArcGIS Enterprise.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>حساب database مخصص للـ ArcGIS Server بأقل صلاحيات لازمة (اقتراح منا).</li>
+<li>الـ shares: حساب ArcGIS Server لازم يقرأ.</li>
+<li>الـ cloud stores: credentials أو مفاتيح وصول بتدخلها وقت التسجيل.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>المستخدم يطلب الـ service → ArcGIS Server يقرأ مباشرة من الـ database أو الـ folder أو الـ cloud في مكانها → النتيجة ترجع. مفيش نسخة داخل ArcGIS (مختلف عن الـ hosted).</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead>
+<tbody>
+<tr><td>الـ service بتتبطّأ</td><td>داتا cloud في region بعيد</td><td>نفس region</td></tr>
+<tr><td>الـ service مش بتفتح بعد نقل الداتا</td><td>المسار المسجل اتغيّر</td><td>حدّث تسجيل الـ data store</td></tr>
+<tr><td>feature service مش بتشتغل على file geodatabase</td><td>الـ FGDB read-only لـ ArcGIS Server</td><td>استخدم enterprise geodatabase</td></tr>
+<tr><td>الـ site بطيء ومتعثر</td><td>site بيشاور على FGDB واحدة عبر الشبكة</td><td>نسخة على كل جهاز</td></tr>
+<tr><td>الـ sync بتاع one-way replication فشل</td><td>الـ FGDB مقفولة بـ schema lock</td><td>أوقف الـ service أو شيل الأجهزة مؤقتًا</td></tr>
+</tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul>
+<li>Enterprise geodatabase للـ editing والـ HA؛ FGDB للـ caching والداتا الثابتة.</li>
+<li>FGDB: نسخة على كل جهاز، وما تشاورش على share واحدة.</li>
+<li>الـ multi-machine sites: network share للـ folders.</li>
+<li>الـ cloud: كل شيء في نفس الـ region.</li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/user-storage.html" target="_blank" rel="noopener">User storage</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/dbms-support.html" target="_blank" rel="noopener">Supported databases and data warehouses</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/databases-in-the-cloud.html" target="_blank" rel="noopener">Databases in the cloud</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/administer/caches-in-the-cloud.html" target="_blank" rel="noopener">Caches in the cloud</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>User storage = داتا بتاعتك بتتنشر عليها services بالـ reference: databases وfolders وcloud stores.</li>
+<li>3 طرق للتسجيل: data store item أو Pro أو Server Manager.</li>
+<li>Enterprise geodatabase للـ HA والتعديل؛ FGDB للـ caching والداتا الثابتة، read-only لـ ArcGIS Server، ونسخة على كل جهاز.</li>
+<li>Esri لا تدعم الـ cloud للـ referenced data لو المكونات مش في نفس region.</li>
+</ul>
+</section>
+<section class="topic" id="t-system-directories" hidden><div class="eyebrow">Data storage</div><h1>Options for system directories</h1><p class="subtitle">أماكن الـ content directory والـ config store</p><p class="lead">لما بتنشر ArcGIS Server site أو base ArcGIS Enterprise لازم تختار مكان تخزين الـ <strong>system directories</strong>. أحسن اختيار بيعتمد على بيئة الـ deployment. التلات أنواع: <strong>portal content directory</strong> (لـ Portal for ArcGIS)، و<strong>configuration store</strong>، و<strong>server directories</strong> (الاتنين لـ ArcGIS Server).</p>
+
+<h2 id="local-vs-share">Local folders ولا Network shares؟</h2>
+<p>الاتنين شغالين في الـ on-premises والـ cloud:</p>
+<ul>
+<li><strong>Local folders مُوصى بيها</strong> لما المكوّن بيشتغل على جهاز واحد.</li>
+<li><strong>Network shares</strong> مناسبة للمكونات متعددة الأجهزة، زي Portal عالي التوافر (HA) أو site متعدد الأجهزة.</li>
+</ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي)</div>
+<p>site على جهاز واحد للتطوير: الـ config store على <code>C:\<wbr>arcgisserver\<wbr>config-store</code> محليًا، أسرع وأبسط. لما تتوسع لـ 3 أجهزة: لازم الـ config store والـ server directories على share يشوفه الـ 3.</p></div>
+
+<h2 id="modify">تعديل مكان الـ system directory بعدين</h2>
+<ul>
+<li>الـ <strong>portal content directory</strong> تقدر تنقله لـ cloud storage بعد كده.</li>
+<li>الـ <strong>server directories</strong> والـ <strong>configuration store</strong> في الـ cloud: مكانهم بيتحدد <strong>وقت الإعداد الأولي للـ site فقط</strong>.</li>
+</ul>
+<div class="callout danger"><div class="callout-title">لازم تقرر من الأول</div>
+<p>لو عايز cloud storage للـ server directories أو الـ configuration store، قرر قبل ما تنشئ الـ site. مش هتقدر تعدّل بعدين.</p></div>
+
+<h2 id="cloud">بيئات الـ Cloud</h2>
+<p>الـ cloud storage مُوصى بيه، خصوصًا لو هتتوسع لأكتر من جهاز أو بتبني sites عالية التوافر.</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>الـ directory</th><th>الخدمات المدعومة</th></tr></thead>
+<tbody>
+<tr><td>Portal content directory وConfiguration store</td><td>Amazon S3، Azure Blob Storage، Alibaba Cloud OSS</td></tr>
+<tr><td>Server directories</td><td>Amazon S3، Azure Blob Storage</td></tr>
+</tbody></table></div>
+<ul>
+<li>بديل: <strong>SSD volumes</strong> في AWS وAzure، وتقدر توسعها بمرور الوقت. استخدم نوع الـ volume أو الـ disk الأصلي للبيئة (Amazon EBS volume types وAzure managed disk types).</li>
+</ul>
+
+<h2 id="on-prem">بيئات الـ On-premises</h2>
+<p><strong>Why:</strong> الأجهزة المتعددة بتقرأ وتكتب في نفس الملفات. لو جهاز كتب ملف وجهاز تاني قرأ نسخة قديمة، الـ site بيتلخبط.</p>
+<ul>
+<li>اختار storage بحيث <strong>الملفات تبقى مقروءة فورًا من أي node بعد ما الكتابة تخلص</strong>.</li>
+<li>ده <strong>بيستبعد</strong> أنظمة ملفات موزعة كتير، زي <strong>GFS</strong> (Google File System) وـ <strong>GlusterFS</strong> وـ <strong>DFS</strong> (Distributed File System).</li>
+<li>الـ <strong>NFS shares</strong> لازم تضمن قراءات متسقة (consistent reads) وتتجنب الـ stale caches (نسخ مؤقتة قديمة).</li>
+<li>الـ <strong>immediate consistency</strong> (الاتساق الفوري) والأداء على الـ I/O الصغير العشوائي أساسيين.</li>
+</ul>
+<div class="callout warn"><div class="callout-title">تحذير على Windows</div>
+<p>صفحات سابقة في الدليل ذكرت إن ArcGIS Server على Windows ما بيدعمش NFS. وكمان الـ DFS مذكور هنا كمثال لنظام ملفات موزع مش مناسب. راجع قائمة المتطلبات لو بتخطط تستخدم file system غير SMB عادي.</p></div>
+
+<h2 id="performance">اعتبارات الأداء</h2>
+<ul>
+<li>أداء القراءة والكتابة بيختلف حسب نوع الـ I/O.</li>
+<li>storage مُحسّن للـ <strong>I/O الكبير المتسلسل (large, sequential)</strong>، الشائع مع imagery وvideo، <strong>غالبًا غير مناسب</strong> للـ system directories.</li>
+<li>لو الـ storage ضعيف في الـ <strong>small random I/O</strong>: ممكن تشوف responses بطيئة أو فشل، خصوصًا في المهام الإدارية.</li>
+</ul>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div>
+<p>زي ما قاعدة بيانات SQL على disk بطيء بتتعب مع آلاف الاستعلامات الصغيرة حتى لو الـ disk سريع في نسخ ملف كبير. الـ system directories ملفات صغيرة كتير بتتقرأ وتتكتب باستمرار.</p></div>
+
+<h2 id="pillars">الـ 5 محاور: System directories</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<ul>
+<li>Network share: SMB على الشبكة الداخلية. أي انقطاع بين الأجهزة والـ share يوقف الـ site.</li>
+<li>Cloud: HTTPS خارجي للـ S3 وـ Blob وـ OSS.</li>
+</ul>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<ul>
+<li>الحساب اللي بيشغّل ArcGIS Server أو Portal لازم يقدر يكتب على الـ directories (خصوصًا الـ share).</li>
+<li>Cloud: credentials للـ bucket أو الـ container.</li>
+</ul>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Directory</th><th>بيخدم</th><th>بيحتوي على</th></tr></thead>
+<tbody>
+<tr><td>Portal content directory</td><td>Portal for ArcGIS</td><td>المحتوى المرفوع والمحفوظ من المستخدمين</td></tr>
+<tr><td>Configuration store</td><td>ArcGIS Server</td><td>خصائص الـ site: machines وclusters</td></tr>
+<tr><td>Server directories</td><td>ArcGIS Server</td><td>tile caches، ملفات geoprocessing، output مؤقت، ملفات مرفوعة، معلومات اتصال services وdatabases</td></tr>
+</tbody></table></div>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead>
+<tbody>
+<tr><td>الـ site بطيء أو الإدارة بتفشل</td><td>storage ضعيف في small random I/O</td><td>storage مناسب (SSD)</td></tr>
+<tr><td>نتايج غير متسقة بين الأجهزة</td><td>file system موزع بدون immediate consistency (GlusterFS، DFS)</td><td>storage بقراءة فورية</td></tr>
+<tr><td>بيانات قديمة بتظهر من NFS</td><td>stale caches</td><td>اضبط الـ NFS لقراءات متسقة</td></tr>
+<tr><td>الـ share واقعة</td><td>نقطة فشل واحدة (SPOF)</td><td>خلي الـ share عالي التوافر، أو cloud storage</td></tr>
+<tr><td>عايز تغيّر مكان server directories في الـ cloud</td><td>بيتحدد وقت الإعداد الأولي بس</td><td>قرر من الأول</td></tr>
+</tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul>
+<li>جهاز واحد: local folder. أكتر من جهاز: network share أو cloud.</li>
+<li>الـ cloud: cloud storage مُوصى بيه للتوسع والـ HA.</li>
+<li>مفيش storage مُحسّن للـ large sequential فقط.</li>
+</ul>
+
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left">
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/options-for-system-directories.html" target="_blank" rel="noopener">Options for system directories</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/required-system-storage.html" target="_blank" rel="noopener">Required system storage</a></li>
+<li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/administer/about-server-directories.html" target="_blank" rel="noopener">About server directories</a></li>
+</ul>
+
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul>
+<li>Local folders لجهاز واحد، network shares لـ HA والـ multi-machine.</li>
+<li>الـ cloud: S3 وBlob وOSS للـ portal content directory والـ configuration store؛ S3 وBlob للـ server directories. الـ cloud locations للـ server directories والـ config store بتتحدد وقت الإعداد الأول.</li>
+<li>On-premises: اتساق فوري (immediate consistency) وأداء small random I/O؛ بيستبعد GFS وGlusterFS وDFS.</li>
+</ul>
+</section>
+<section class="topic" id="t-dbms-support" hidden><div class="eyebrow">Databases and data warehouses</div><h1>Supported databases and data warehouses</h1><p class="subtitle">خريطة الـ databases المدعومة</p><p class="lead">الصفحة دي هي <strong>خريطة الـ databases</strong> اللي ArcGIS تقدر تتصل بيها: كل نظام، واللي تقدر تعمله معاه (استعلام، نشر، تعديل، geodatabase)، والمحاذير اللي لازم تعرفها قبل ما تختار.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>في Pro بتعمل Add Database Connection لأي database وتفتح جداولها. الصفحة دي بتقولك: <strong>أنهي databases بتشتغل بالطريقة دي، وإيه المحاذير لكل واحدة</strong>. وكل database ليها صفحة متطلبات مستقلة (الصفحات اللي بعد الصفحة دي في الدليل).</p></div>
+<h2 id="overview">الفكرة العامة</h2>
+<p><strong>Why:</strong> كل database بتتعامل مع الـ spatial data (الداتا المكانية) بطريقتها (نوع geometry مختلف، أمر index مختلف، طريقة authentication مختلفة). فـ ArcGIS مش بيتعامل مع الكل بنفس الشكل. الصفحة دي بتديك الخلاصة السريعة لكل نظام، والتفاصيل في صفحته.</p>
+<p>الصفحة بتغطي <strong>أي databases وdata warehouses</strong> تقدر clients الـ ArcGIS (Pro وServer وغيرهم) تتصل بيها.</p>
+
+<h2 id="supported">الأنظمة المدعومة وأهم ملاحظاتها</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>النظام</th><th>اللي تقدر تعمله (حسب الصفحة)</th><th>ملاحظات مهمة</th></tr></thead><tbody><tr><td><strong>Dameng</strong> (داميينج)</td><td>استعلام (query)، ونشر map image layers وweb feature layers. الـ web feature layers القابلة للتعديل بتخلّي المحررين يعدّلوا الداتا</td><td>الداتا المكانية بتستخدم نوع geometry بتاع Dameng، ولازم يتم <strong>initialize</strong> (تهيئته) قبل الاستخدام</td></tr><tr><td><strong>Elasticsearch</strong></td><td>الاتصال من ArcGIS Pro، استعلام، نشر map image وweb feature layers</td><td>نشر web layer بيتطلب <strong>basic authentication</strong> (اسم مستخدم وكلمة مرور)</td></tr><tr><td><strong>IBM Db2</strong></td><td>استعلام ونشر map image وweb feature layers، مع دعم التعديل للـ feature layers</td><td>تقدر تنشئ geodatabase في Db2 (ده بيفتح أنواع web layers إضافية). الـ database authentication بيسمح تحفظ username وpassword، وده <strong>مطلوب</strong> لتسجيل الاتصال مع ArcGIS Server</td></tr><tr><td><strong>Microsoft SQL Server</strong></td><td>استعلام ونشر وتعديل. تقدر تنشئ geodatabase</td><td>المستخدمين اللي بينشئوا database objects لازم <strong>username يطابق اسم الـ schema</strong></td></tr><tr><td><strong>OpenSearch</strong></td><td>الاتصال من Pro بـ basic authentication، ونشر map image وweb feature layers</td><td>—</td></tr><tr><td><strong>Oracle</strong></td><td>استعلام ونشر وتعديل</td><td>الأنواع المكانية: <strong>SDO_Geometry</strong> (تركيب طرف تالت منفصل) وـ <strong>ST_Geometry</strong> من Esri (محتاج geoprocessing tool للإعداد). الـ geodatabases بتركّب ST_Geometry <strong>تلقائيًا</strong></td></tr><tr><td><strong>PostgreSQL</strong></td><td>استعلام ونشر وتعديل</td><td>بيدعم أنواع PostGIS (geometry وgeography، تركيب منفصل) وـ ST_Geometry. فيه تعليمات إعداد لـ Linux وWindows. المستخدمين اللي بينشئوا objects لازم <strong>username يطابق اسم الـ schema</strong></td></tr><tr><td><strong>SAP HANA</strong></td><td>استعلام ونشر وتعديل</td><td>التخزين columnar (بالأعمدة) فمش محتاج <strong>spatial index</strong>، ومفيش user-defined indexes بتديرها، والـ spatial references لازم تكون موجودة في الـ system table، والـ <strong>SRID 4326</strong> بيتصرف بشكل مختلف عن المتوقع في ArcGIS</td></tr><tr><td><strong>Teradata Vantage</strong></td><td>استعلام ونشر وتعديل</td><td>محتاج تركيب GSS client وICU library وODBC driver <strong>بترتيب محدد</strong> (التفاصيل تحت)</td></tr></tbody></table></div>
+<h3 id="teradata-rules">إرشادات Teradata الواردة في الصفحة</h3>
+<ul><li>أعمدة الـ spatial لازم اسمها أو alias بتاعها <code>shape</code>.</li><li>ArcGIS بينشئ الجداول <strong>فقط في database المستخدم نفسه</strong>.</li><li>الـ spatial index لازم يتعمل بـ <strong>tessellation functions</strong> بتاعت Teradata (تقسيم الفراغ لخلايا لتسريع البحث).</li><li>لازم يكون فيه حقل <strong>unique ID</strong>، وأدوات ArcGIS <strong>ما تقدرش تنشئ صفوف (rows)</strong> في Teradata.</li><li>للتعامل مع جزء من داتا كبيرة استخدم <strong>query layers</strong> أو <strong>database views</strong> أو <strong>definition queries</strong>.</li><li>خد backup لجدولي <code>SPATIAL_REF_SYS</code> وـ <code>GEOMETRY_COLUMNS</code> قبل ما تعمل upgrade لـ Teradata.</li></ul>
+<div class="callout warn"><div class="callout-title">تنبيه للدقة</div><p>التفاصيل الخاصة بـ Dameng وTeradata وSAP HANA اللي في الجدول فوق مأخوذة من صفحة الـ overview نفسها (dbms-support). صفحات المتطلبات المستقلة بتغطي الإصدارات والـ clients وحاجات تانية، وما بتكررش كل الملاحظات دي. لو لقيت اختلاف، صفحة الـ vendor المخصصة هي المرجع الأدق.</p></div>
+
+<h2 id="cloud">قواعد البيانات السحابية (Cloud)</h2>
+<ul><li>فيه عدة عروض <strong>database-as-a-service</strong> (قاعدة بيانات كخدمة) و<strong>cloud data warehouses</strong> مدعومة.</li><li>للأداء الأفضل: شغّل الـ ArcGIS clients في <strong>نفس الـ cloud ونفس الـ region</strong> اللي فيه الـ database.</li><li>أغلب الـ cloud databases محتاجة <strong>database client</strong> على الـ client machine.</li><li>الـ cloud data warehouses محتاجة <strong>client libraries</strong> من الـ vendor بتاعها.</li></ul>
+<p>التفاصيل في صفحة <a data-go="databases-in-cloud" href="#">Databases in the cloud</a>.</p>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): اختيار database لمشروع شبكة صرف</div><p>محتاج enterprise geodatabase بـ versioning لشبكة صرف بيعدّل فيها 15 مهندس. من الجدول: SQL Server وOracle وPostgreSQL وDb2 وSAP HANA كلهم بيدعموا التعديل ويمكن تنشئ فيهم geodatabase، بينما Elasticsearch وOpenSearch وDameng وTeradata <strong>مفيهومش geodatabase</strong> (حسب صفحاتهم). يبقى الاختيار من الأربعة الأولانيين. وبعد كده القرار بيتحدد حسب اللي المؤسسة بتشغله أصلاً وعندها فيه DBA.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>صفحة الـ overview ما بتحددش ports. كل نظام ليه port افتراضي عند الـ vendor (انظر صفحة كل نظام). القاعدة العامة: ArcGIS Server وـ ArcGIS Pro لازم يوصلوا لـ port الـ database، وفي الـ cloud لازم يكونوا في نفس الـ region.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>الـ database authentication (اسم مستخدم وكلمة مرور) هي الطريقة الأساسية في الصفحة. لتسجيل الاتصال مع ArcGIS Server في Db2 لازم تحفظ username وpassword. وفي Elasticsearch وOpenSearch: basic authentication. وفي SQL Server وPostgreSQL: اسم المستخدم لازم يطابق اسم الـ schema لما بتنشئ objects.</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا بتفضل في الـ database (referenced)، وـ ArcGIS بيقرأ منها مباشرة. لتعديل داتا مش مسجلة مع geodatabase: انشر editable web feature layer.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>Layer مش بتنشر على Teradata</td><td>اسم عمود الـ spatial مش shape</td><td>اعمل alias بـ shape</td></tr><tr><td>Geodatabase مش بتتنشأ على Elasticsearch</td><td>مش مدعوم</td><td>استخدم database تانية</td></tr><tr><td>Spatial index مطلوب لـ SAP HANA</td><td>التخزين columnar، مش محتاج index</td><td>متنشئوش، مش مطلوب</td></tr><tr><td>شغل cloud بطيء</td><td>client في region مختلف</td><td>انقل الـ client لنفس region الـ database</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>اختار database بحسب احتياجك: لو محتاج geodatabase بـ versioning ابعد عن الأنظمة اللي مفيهاش geodatabase.</li><li>في الـ cloud: نفس الـ cloud ونفس الـ region.</li><li>قبل upgrade لـ Teradata: backup للجدولين.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/dbms-support.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>ArcGIS بيتصل بـ Dameng وElasticsearch وDb2 وSQL Server وOpenSearch وOracle وPostgreSQL وSAP HANA وTeradata Vantage.</li><li>كل نظام ليه متطلباته وصفحته: الإصدارات، الـ client، الـ limitations.</li><li>فيه أنظمة بتدعم geodatabase وأنظمة لأ: دي أهم نقطة في الاختيار.</li><li>في الـ cloud: نفس cloud ونفس region.</li><li>للتعديل: editable web feature layer أو بيانات مسجلة مع geodatabase.</li></ul>
+</section>
+<section class="topic" id="t-dameng" hidden><div class="eyebrow">Databases and data warehouses</div><h1>Dameng requirements</h1><p class="subtitle">متطلبات Dameng</p><p class="lead"><strong>Dameng</strong> (داميينج) database صينية الأصل. ArcGIS Pro وArcGIS Server يقدروا يتصلوا بيها، لكن بقيود: مفيش geodatabase، ومش data store item، ومش على Kubernetes.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">إصدارات Dameng المدعومة</h2>
+<p>الحد الأدنى للإصدارات (minimum releases):</p>
+<ul><li>Dameng <strong>V8.1.0.147</strong></li><li>Dameng <strong>V7.1.6</strong></li><li>Dameng <strong>V7.1.5</strong></li></ul>
+<p>الـ patches والـ updates على الإصدارات دي <strong>مدعومة لكن مش معتمدة (certified)</strong>.</p>
+<div class="callout tip"><div class="callout-title">يعني إيه certified وsupported؟</div><p><strong>Certified</strong> (معتمد) = Esri اختبرت الإصدار ده بنفسها. <strong>Supported</strong> (مدعوم) = لو حصلت مشكلة Esri هتساعدك حتى لو ما اختبرتش الإصدار بالتحديد. فلما الصفحة تقول "الـ service packs والـ patches مدعومة مش معتمدة" يعني: هتتساعد، لكن اتأكد من بيئة الاختبار قبل ما تطبّق على production.</p></div>
+<h2 id="limits">القيود (Limitations)</h2>
+<ul><li><strong>الـ geodatabase functionality مش مدعومة</strong>: مش هتقدر تنشئ geodatabase في Dameng.</li><li>Dameng <strong>مش مدعوم كـ data store item</strong> في ArcGIS Enterprise (يعني ما تقدرش تضيفه كـ data store item رسمي).</li><li>Dameng <strong>مش مدعوم مع ArcGIS Enterprise on Kubernetes</strong>.</li><li>من صفحة الـ overview: الداتا المكانية بتستخدم نوع geometry بتاع Dameng ولازم يتم initialize قبل الاستخدام.</li></ul>
+<h2 id="cloud">دعم الـ Cloud</h2>
+<p>راجع صفحة <a data-go="databases-in-cloud" href="#">Databases in the cloud</a> للمتطلبات.</p>
+<h2 id="client">البرامج المطلوبة للاتصال (Client software)</h2>
+<p>أي جهاز (ArcGIS Pro أو ArcGIS Server) محتاج <strong>database client files</strong> من الـ vendor. الصفحة بتحدد:</p>
+<ul><li>على <strong>Windows</strong>: Dameng <strong>8.x أو 7.x ODBC client</strong>. (<strong>ODBC</strong> = Open Database Connectivity، واجهة قياسية بتخلي البرنامج يتكلم مع أي database.)</li><li><strong>ArcGIS Server على Linux</strong> لازم يستخدم Dameng <strong>8.x ODBC client</strong> بس.</li></ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): جهاز Linux ومعاه client 7.x</div><p>مؤسسة عندها ArcGIS Server على Linux وركّبت Dameng 7.x ODBC client لأنه نفس اللي على Windows. النشر بيفشل. الصفحة صريحة: على Linux لازم 8.x. الحل: ركّب 8.x على جهاز Linux، واترك 7.x أو 8.x على Windows.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>زي ما بتحتاج Oracle Client أو SQL Server driver على جهازك عشان تعمل Database Connection في Pro، هنا بتحتاج Dameng ODBC client. من غيره الـ connection مش بتتعمل.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p><strong>ملحوظة صريحة:</strong> صفحة Esri ما بتذكرش أرقام ports هنا. الرقم هو الـ port الافتراضي عند الـ vendor (معلومة عامة مش من صفحة Esri)، وممكن يكون متغيّر في بيئتك، فاسأل الـ DBA.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>Dameng بتستخدم database authentication. لازم الحساب يقدر يقرأ (وكتابة لو editable web feature layers).</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في Dameng، ArcGIS Server بيقرأ عن طريق ODBC. مفيش geodatabase، فالتعديل بيتم عن طريق editable web feature layers بس.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>الاتصال بيفشل على Linux</td><td>client 7.x على ArcGIS Server Linux</td><td>ركّب 8.x ODBC client</td></tr><tr><td>مش لاقي Dameng كـ data store item</td><td>غير مدعوم</td><td>سجّل الاتصال مع Server مباشرة</td></tr><tr><td>نشر على Kubernetes مش شغال</td><td>غير مدعوم</td><td>استخدم Enterprise على Windows أو Linux</td></tr><tr><td>الـ geometry مش بتظهر</td><td>نوع geometry لم يتم initialize</td><td>هيّئ النوع قبل الاستخدام (حسب overview)</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>ثبّت client بنفس الإصدار على كل جهاز ArcGIS Server.</li><li>اختبر patches على بيئة اختبار (مدعومة مش معتمدة).</li><li>لو محتاج geodatabase: استخدم database تانية.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-requirements-dameng.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>V8.1.0.147 وV7.1.6 وV7.1.5 هي الحد الأدنى.</li><li>مفيش geodatabase، مش data store item، مش على Kubernetes.</li><li>Windows: ODBC 8.x أو 7.x. Linux Server: 8.x بس.</li></ul>
+</section>
+<section class="topic" id="t-elasticsearch" hidden><div class="eyebrow">Databases and data warehouses</div><h1>Elasticsearch requirements</h1><p class="subtitle">متطلبات Elasticsearch</p><p class="lead">محرك بحث وتحليل (search and analytics engine) بيخزن documents بصيغة JSON. ArcGIS Enterprise وArcGIS Pro يقدروا يتصلوا بيه <strong>للقراءة فقط (read-only)</strong>، حسب وصف صفحة Esri.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">الإصدارات المدعومة (Supported Elasticsearch version)</h2>
+<p>الـ service packs والـ minor releases على النسخ دي مدعومة لكن مش معتمدة.</p>
+<ul><li>Elasticsearch <strong>9.0.3</strong></li><li>Elasticsearch <strong>8.14</strong></li></ul>
+<div class="callout tip"><div class="callout-title">يعني إيه certified وsupported؟</div><p><strong>Certified</strong> (معتمد) = Esri اختبرت الإصدار ده بنفسها. <strong>Supported</strong> (مدعوم) = لو حصلت مشكلة Esri هتساعدك حتى لو ما اختبرتش الإصدار بالتحديد. فلما الصفحة تقول "الـ service packs والـ patches مدعومة مش معتمدة" يعني: هتتساعد، لكن اتأكد من بيئة الاختبار قبل ما تطبّق على production.</p></div>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li><strong>الـ geodatabases غير مدعومة في Elasticsearch</strong> (نص الصفحة).</li></ul>
+<h2 id="overview-notes">من صفحة الـ overview</h2>
+<ul><li>تقدر تتصل من ArcGIS Pro وتعمل query وتنشر map image layers وweb feature layers.</li><li>نشر الـ web layer بيتطلب <strong>basic authentication</strong> (username وpassword).</li></ul>
+<h2 id="what-is">إيه الفرق بينه وبين RDBMS؟</h2>
+<p><strong>Why:</strong> Elasticsearch مش جداول وعلاقات، هو <strong>index</strong> بيخزن documents. بيتميز بالبحث النصي السريع والتجميعات (aggregations). فـ ArcGIS بيتعامل معاه كمصدر للقراءة والعرض والتحليل، مش للتحرير ولا للـ geodatabase.</p>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): لوحة بلاغات من نظام logs</div><p>نظام بلاغات الصيانة في الشركة بيحفظ كل بلاغ كـ document في {name} وفيه حقل موقع. عايز تعرض البلاغات على خريطة في Dashboards. تتصل من Pro، تعمل query، تنشر map image layer أو web feature layer (بـ basic authentication). لكن ما تحاولش تنشئ geodatabase عليه أو تعمل versioning: الصفحة بتقول مش مدعوم.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>الـ {name} زي Table من نوع read-only في Pro: تقدر تعمل عليها Select By Attributes وتعرضها، لكن مفيش Attribute Rules ولا Versioning لأنهم محتاجين geodatabase.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p><strong>ملحوظة صريحة:</strong> صفحة Esri ما بتذكرش أرقام ports هنا. الرقم هو الـ port الافتراضي عند الـ vendor (معلومة عامة مش من صفحة Esri)، وممكن يكون متغيّر في بيئتك، فاسأل الـ DBA.</p><p>الـ port الافتراضي عند الـ vendor لـ Elasticsearch هو <code>9200</code> (REST/HTTP). تأكد منه في بيئتك.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>Basic authentication: اسم مستخدم وكلمة مرور. اعمل حساب مخصص للـ ArcGIS بصلاحيات قراءة بس على الـ indices المطلوبة (اقتراح منا).</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في Elasticsearch. ArcGIS بيقرأ ويستعلم. مفيش geodatabase، فمفيش تعديل versioned.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>نشر الـ layer بيفشل</td><td>مفيش basic authentication</td><td>فعّل basic auth على الـ cluster وادخل بيانات الحساب</td></tr><tr><td>مفيش خيار Create geodatabase</td><td>مش مدعوم</td><td>استخدم database تانية</td></tr><tr><td>الإصدار مش شغال</td><td>خارج الإصدارات المدعومة</td><td>استخدم أحد: Elasticsearch 9.0.3 / Elasticsearch 8.14</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>استخدمه للقراءة والعرض والتحليل فقط.</li><li>لو محتاج تعديل: خزّن الداتا في database تانية.</li><li>حساب read-only مخصص.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-reqs-elasticsearch.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>الإصدارات المدعومة: Elasticsearch 9.0.3, Elasticsearch 8.14.</li><li>الـ geodatabases غير مدعومة.</li><li>نشر web layers محتاج basic authentication.</li></ul>
+</section>
+<section class="topic" id="t-db2" hidden><div class="eyebrow">Databases and data warehouses</div><h1>IBM Db2 requirements</h1><p class="subtitle">متطلبات IBM Db2</p><p class="lead">ArcGIS Pro وArcGIS Enterprise بيتصلوا بـ <strong>IBM Db2</strong> وبـ <a href="https://doc.esri.com/en/arcgis-pro/3.7/help/data/geodatabases/overview/types-of-geodatabases.html" target="_blank" rel="noopener">enterprise geodatabases</a> المخزنة فيه (على Linux وWindows).</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">إصدارات Db2 المدعومة</h2>
+<p>الحد الأدنى المعتمد والمدعوم (minimum certified and supported):</p>
+<ul><li>IBM Db2 Version <strong>12.1.3</strong></li><li>IBM Db2 Version <strong>11.5.9 Fix Pack 0 Cumulative Special Build 58840</strong></li></ul>
+<p>الـ fix packs الأحدث على الإصدارين دول مدعومة لكن مش معتمدة، إلا لو اتذكر غير كده.</p>
+<div class="callout tip"><div class="callout-title">يعني إيه certified وsupported؟</div><p><strong>Certified</strong> (معتمد) = Esri اختبرت الإصدار ده بنفسها. <strong>Supported</strong> (مدعوم) = لو حصلت مشكلة Esri هتساعدك حتى لو ما اختبرتش الإصدار بالتحديد. فلما الصفحة تقول "الـ service packs والـ patches مدعومة مش معتمدة" يعني: هتتساعد، لكن اتأكد من بيئة الاختبار قبل ما تطبّق على production.</p></div>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li>لازم الـ Db2 databases تستخدم ترميز <strong>UTF-8</strong> (Unicode Transformation Format 8-bit: ترميز بيدعم كل اللغات، منها العربي).</li><li><strong>Branch versioned data</strong> (نمط versioning حديث بيشتغل على الويب) محتاجة <strong>Db2 12.1.3 أو service pack أحدث</strong>، ولازم تدّي المستخدمين الصلاحيات دي: <code>EXECUTE ON SYSIBMADM.DBMS_LOCK</code> و<code>SELECT ON SYSIBMADM.APPLICATIONS</code> و<code>USE ON SYSTOOLSPACE</code>.</li><li>مع ملف اتصال <code>.sde</code> (database connection file) في ArcGIS Pro تقدر تعدّل فقط الداتا <strong>المسجلة (registered) مع الـ geodatabase</strong>. لتعديل أي داتا تانية في الـ database: انشر <strong>editable web feature layer</strong> يشاور عليها وعدّل من خلاله.</li><li>Db2 <strong>مش مدعوم</strong> مع ArcGIS Enterprise on Kubernetes.</li></ul>
+<h3 id="ver-table">جدول متطلبات كل إصدار</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>إصدار Db2</th><th>المتطلبات والقيود</th></tr></thead><tbody><tr><td><strong>IBM Db2 V12.1.3 (64 bit)</strong></td><td>الحد الأدنى: Fix Pack 0.<br>Db2 <strong>Spatial Extender</strong> (الإضافة اللي بتدعم الداتا المكانية) مضمّنة في وسائط التركيب.<br>تغييرات في نموذج الصلاحيات (privilege model) في الإصدار ده تتطلب صلاحيات محدّثة للمستخدم <code>sde</code> لو الـ database فيها enterprise geodatabase.</td></tr><tr><td><strong>IBM Db2 V11.5.9 (64 bit)</strong></td><td>الحد الأدنى: Fix Pack 0 Cumulative Special Build 58840.<br>Db2 Spatial Extender مضمّنة في وسائط التركيب.</td></tr></tbody></table></div>
+<h2 id="os">أنظمة التشغيل المدعومة</h2>
+<ul><li>لو Db2 على نفس السيرفر مع منتجات ArcGIS: نظام التشغيل لازم يحقق متطلبات منتج ArcGIS <strong>و</strong> متطلبات إصدار Db2.</li><li>لو على سيرفر منفصل: راجع توثيق IBM لمتطلبات النظام.</li><li>ArcGIS مختبر ومعتمد على <strong>Db2 Enterprise Server Edition</strong>. إصدارا <strong>Workgroup Server Edition</strong> وـ <strong>Personal Edition</strong> بيشاركوا نفس الـ code base ومدعومين لو حققوا متطلبات ArcGIS Server.</li></ul>
+<h2 id="cloud">دعم الـ Cloud</h2><p>للـ database services والـ databases المنشورة على cloud: راجع <a data-go="databases-in-cloud" href="#">Requirements for using ArcGIS with databases in the cloud</a>.</p>
+<h2 id="client">البرامج المطلوبة للاتصال</h2>
+<p>الأجهزة (Pro وServer) محتاجة database client من IBM (انظر صفحة Database clients). الـ <strong>IBM Data Server Runtime Client for Db2</strong> متاح من <strong>My Esri</strong> (بوابة Esri لتحميل المنتجات).</p>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ترقية من 11.5.9 لـ 12.1.3</div><p>مؤسسة عندها enterprise geodatabase على Db2 11.5.9 وعايزة branch versioning. من الصفحة: محتاجين Db2 12.1.3. بعد الترقية لازم: (1) تدّي المستخدمين الصلاحيات التلاتة، (2) تحدّث صلاحيات المستخدم sde حسب نموذج الصلاحيات الجديد. من غير دول branch versioning مش هيشتغل.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>لما بتعمل connection لـ Db2 في Pro بتسجل username وpassword. لتسجيل نفس الاتصال مع ArcGIS Server بنفس الطريقة: الـ database authentication اللي بيحفظ بيانات الدخول (حسب صفحة الـ overview هو <strong>المطلوب</strong> للتسجيل).</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>Port افتراضي عند IBM لـ Db2: <code>50000</code> (معلومة عامة، مش من صفحة Esri). اتأكد من بيئتك.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>حساب الـ <code>sde</code> (مالك الـ geodatabase) محتاج صلاحيات محدثة في 12.1.3. المستخدمين لـ branch versioning محتاجين الصلاحيات التلاتة. تسجيل الاتصال مع Server بـ database authentication (username وpassword محفوظين).</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في Db2. الـ Spatial Extender بتدير الـ spatial types. التعديل في Pro عبر .sde للداتا المسجلة بس، وغيرها عبر editable web feature layer.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>Branch versioning فشل</td><td>الإصدار أقل من 12.1.3 أو الصلاحيات ناقصة</td><td>رقّي لـ 12.1.3 وامنح EXECUTE ON SYSIBMADM.DBMS_LOCK وSELECT ON SYSIBMADM.APPLICATIONS وUSE ON SYSTOOLSPACE</td></tr><tr><td>حروف عربي بتبوظ</td><td>الـ database مش UTF-8</td><td>الـ database لازم UTF-8</td></tr><tr><td>مش قادر أعدّل جدول من Pro</td><td>الجدول مش مسجل مع geodatabase</td><td>سجّله أو انشر editable web feature layer</td></tr><tr><td>بعد ترقية 12.1.3 المستخدم sde مش شغال</td><td>تغيير نموذج الصلاحيات</td><td>حدّث صلاحيات sde</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>UTF-8 دايمًا.</li><li>12.1.3 لو محتاج branch versioning.</li><li>الـ Enterprise Server Edition هو المختبر؛ الباقي مدعوم بشروط.</li><li>اختبر الـ fix packs على بيئة اختبار.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-requirements-db2.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>12.1.3 أو 11.5.9 Fix Pack 0 CSB 58840 كحد أدنى.</li><li>UTF-8 إجباري.</li><li>Branch versioning: 12.1.3 + ثلاث صلاحيات.</li><li>مش مدعوم على Kubernetes.</li><li>IBM Data Server Runtime Client من My Esri.</li></ul>
+</section>
+<section class="topic" id="t-sqlserver" hidden><div class="eyebrow">Databases and data warehouses</div><h1>Microsoft SQL Server requirements</h1><p class="subtitle">متطلبات SQL Server</p><p class="lead">ArcGIS Enterprise وArcGIS Pro بيتصلوا بـ <strong>Microsoft SQL Server</strong> وبـ <a href="https://doc.esri.com/en/arcgis-pro/3.7/help/data/geodatabases/overview/types-of-geodatabases.html" target="_blank" rel="noopener">enterprise geodatabases</a> فيه. ده أشهر خيار في مؤسسات كتير، فالصفحة دي لازم تتذاكر كويس.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="collation">شرط الـ Collation (مهم جدًا)</h2>
+<p><strong>Collation</strong> (ترتيب المقارنة) هو اللي بيحدد إزاي database تقارن وترتب النصوص. الـ databases اللي بتخزن geodatabase لازم تتضبط على collation <strong>غير حساس لحالة الأحرف (not case sensitive)</strong>.</p>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ليه case-insensitive</div><p>في الـ stormwater عندك حقل <code>PIPE_ID</code>. لو الـ collation حساس للحروف، البحث عن "mh-01" مش هيلاقي "MH-01". ArcGIS بيفترض مقارنة غير حساسة، فالـ geodatabase مش بتشتغل صح على collation حساس.</p></div>
+<h2 id="versions">إصدارات SQL Server المدعومة</h2>
+<p>الحد الأدنى المعتمد. الـ service packs والـ cumulative updates مدعومة لكن مش معتمدة.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الإصدار (كلها 64-bit)</th><th>Enterprise / Standard / Developer / Express</th></tr></thead><tbody><tr><td>SQL Server <strong>2025</strong></td><td>مدعوم</td></tr><tr><td>SQL Server 2025 on <strong>Linux</strong></td><td>مدعوم</td></tr><tr><td>SQL Server <strong>2022</strong></td><td>مدعوم</td></tr><tr><td>SQL Server 2022 on Linux</td><td>مدعوم</td></tr><tr><td>SQL Server <strong>2019</strong></td><td>مدعوم</td></tr><tr><td>SQL Server 2019 on Linux</td><td>مدعوم</td></tr></tbody></table></div>
+<div class="callout warn"><div class="callout-title">Developer edition</div><p>نسخة Developer مدعومة <strong>في بيئات غير الـ production فقط</strong> (تطوير واختبار).</p></div>
+<div class="callout tip"><div class="callout-title">يعني إيه certified وsupported؟</div><p><strong>Certified</strong> (معتمد) = Esri اختبرت الإصدار ده بنفسها. <strong>Supported</strong> (مدعوم) = لو حصلت مشكلة Esri هتساعدك حتى لو ما اختبرتش الإصدار بالتحديد. فلما الصفحة تقول "الـ service packs والـ patches مدعومة مش معتمدة" يعني: هتتساعد، لكن اتأكد من بيئة الاختبار قبل ما تطبّق على production.</p></div>
+<h2 id="os">أنظمة التشغيل المدعومة</h2>
+<ul><li>لو الـ database على نفس السيرفر مع منتجات ArcGIS: لازم يحقق متطلبات ArcGIS system requirements <strong>و</strong> متطلبات OS لإصدار SQL Server.</li><li>لو على سيرفر منفصل: راجع توثيق Microsoft.</li></ul>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li>مع ملف اتصال <code>.sde</code> (database connection file) في ArcGIS Pro تقدر تعدّل فقط الداتا <strong>المسجلة (registered) مع الـ geodatabase</strong>. لتعديل أي داتا تانية في الـ database: انشر <strong>editable web feature layer</strong> يشاور عليها وعدّل من خلاله.</li></ul>
+<h2 id="cloud">دعم الـ Cloud</h2><p>للـ database services والـ databases المنشورة على cloud: راجع <a data-go="databases-in-cloud" href="#">Requirements for using ArcGIS with databases in the cloud</a>.</p>
+<h2 id="client">البرامج المطلوبة للاتصال</h2>
+<ul><li>أي جهاز بيتصل مباشرة بـ SQL Server محتاج <strong>SQL Server client</strong>. Microsoft بتوزع clients لـ Windows وLinux، وـ Windows clients متاحة كمان على My Esri.</li><li>الـ client لازم يكون <strong>نفس إصدار الـ database أو أحدث</strong>. لما تعمل upgrade للـ SQL Server، اعمل upgrade للـ clients.</li><li>لما ArcGIS توقف دعم إصدار SQL Server، الـ client library بتاعه كمان بتبقى غير مدعومة.</li></ul>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>إصدار SQL Server</th><th>أدنى client</th></tr></thead><tbody><tr><td>SQL Server 2022 و2025</td><td><strong>Microsoft ODBC Driver 18.1</strong> for SQL Server</td></tr><tr><td>SQL Server 2019</td><td><strong>Microsoft ODBC Driver 18</strong> for SQL Server</td></tr></tbody></table></div>
+<div class="callout warn"><div class="callout-title">تنبيه التشفير (Encryption) في ODBC Driver 18</div><p>الـ ODBC Driver 18 غيّر الإعداد الافتراضي للتشفير لـ <strong>yes</strong>. عشان الاتصالات الموجودة تفضل شغالة، Esri بتخلّي التشفير <strong>no</strong> افتراضيًا. لو عايز اتصالات مشفرة، راجع "Encrypted connections to SQL Server databases" في توثيق ArcGIS Pro 3.7.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>لما بتعمل Database Connection لـ SQL Server في Pro، الـ dialog بيسأل عن Instance وAuthentication. الـ driver اللي بيستخدمه ورا الشاشة هو الـ ODBC Driver. فلو الـ Pro اتحدّث وسيرفر SQL ما اتحدّثش (أو العكس)، ممكن الاتصال يفشل لعدم تطابق الـ driver.</p></div>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ترقية SQL Server 2019 → 2022</div><p>الشركة رقّت السيرفر لـ 2022. المطلوب: على كل جهاز ArcGIS Server وPro، ثبّت ODBC Driver 18.1 على الأقل (بدل 18). لو سبت 18، الصفحة بتقول الـ client لازم يكون نفس الإصدار أو أحدث، فهتبقى خارج المدعوم.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>Port افتراضي عند Microsoft: <code>1433</code> (TCP). الـ named instances ممكن تستخدم port ديناميكي عن طريق SQL Browser (<code>1434</code> UDP). معلومة عامة مش من صفحة Esri.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>المستخدمين اللي بينشئوا database objects لازم <strong>username يطابق اسم الـ schema</strong> (حسب overview). الـ authentication: database authentication.</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الـ geodatabase في SQL Server. التعديل عبر .sde للداتا المسجلة بس. تشفير الاتصال معطل افتراضيًا (حسب Esri).</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>مقارنة نصوص بتفشل</td><td>collation حساس للحروف</td><td>استخدم collation غير حساس</td></tr><tr><td>الاتصال بيرفض بعد ترقية السيرفر</td><td>client أقدم من السيرفر</td><td>ثبّت ODBC 18.1 للـ 2022/2025</td></tr><tr><td>الاتصال المشفر فاشل</td><td>التشفير معطل افتراضيًا</td><td>راجع Encrypted connections لـ SQL Server</td></tr><tr><td>Developer edition في production</td><td>غير مدعوم</td><td>استخدم Standard أو Enterprise</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>Collation غير حساس.</li><li>نفس إصدار الـ client أو أحدث.</li><li>Developer للتطوير فقط.</li><li>فعّل التشفير بقرار مقصود وفق مواصفات المؤسسة.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-requirements-sqlserver.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>2019 و2022 و2025 (Windows وLinux) كلها 64-bit.</li><li>Collation غير حساس لحالة الأحرف إجباري للـ geodatabase.</li><li>ODBC Driver 18.1 لـ 2022/2025، و18 لـ 2019.</li><li>الـ client نفس إصدار الـ DB أو أحدث.</li><li>Developer للـ non-production فقط.</li></ul>
+</section>
+<section class="topic" id="t-opensearch" hidden><div class="eyebrow">Databases and data warehouses</div><h1>OpenSearch requirements</h1><p class="subtitle">متطلبات OpenSearch</p><p class="lead">محرك بحث وتحليل مفتوح المصدر. ArcGIS Pro وArcGIS Enterprise يقدروا يتصلوا بـ OpenSearch clusters.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">الإصدارات المدعومة (Supported OpenSearch version)</h2>
+<p>إصدار واحد بس مدعوم، والـ service packs عليه مدعومة لكن مش معتمدة.</p>
+<ul><li>OpenSearch <strong>2.12</strong></li></ul>
+<div class="callout tip"><div class="callout-title">يعني إيه certified وsupported؟</div><p><strong>Certified</strong> (معتمد) = Esri اختبرت الإصدار ده بنفسها. <strong>Supported</strong> (مدعوم) = لو حصلت مشكلة Esri هتساعدك حتى لو ما اختبرتش الإصدار بالتحديد. فلما الصفحة تقول "الـ service packs والـ patches مدعومة مش معتمدة" يعني: هتتساعد، لكن اتأكد من بيئة الاختبار قبل ما تطبّق على production.</p></div>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li><strong>الـ geodatabases غير مدعومة في OpenSearch</strong> (نص الصفحة).</li></ul>
+<h2 id="overview-notes">من صفحة الـ overview</h2>
+<ul><li>تقدر تتصل من ArcGIS Pro وتعمل query وتنشر map image layers وweb feature layers.</li><li>الاتصال من ArcGIS Pro بـ <strong>basic authentication</strong> ونشر map image وweb feature layers.</li></ul>
+<h2 id="what-is">إيه الفرق بينه وبين RDBMS؟</h2>
+<p><strong>Why:</strong> OpenSearch مش جداول وعلاقات، هو <strong>index</strong> بيخزن documents. بيتميز بالبحث النصي السريع والتجميعات (aggregations). فـ ArcGIS بيتعامل معاه كمصدر للقراءة والعرض والتحليل، مش للتحرير ولا للـ geodatabase.</p>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): لوحة بلاغات من نظام logs</div><p>نظام بلاغات الصيانة في الشركة بيحفظ كل بلاغ كـ document في {name} وفيه حقل موقع. عايز تعرض البلاغات على خريطة في Dashboards. تتصل من Pro، تعمل query، تنشر map image layer أو web feature layer (بـ basic authentication). لكن ما تحاولش تنشئ geodatabase عليه أو تعمل versioning: الصفحة بتقول مش مدعوم.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>الـ {name} زي Table من نوع read-only في Pro: تقدر تعمل عليها Select By Attributes وتعرضها، لكن مفيش Attribute Rules ولا Versioning لأنهم محتاجين geodatabase.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p><strong>ملحوظة صريحة:</strong> صفحة Esri ما بتذكرش أرقام ports هنا. الرقم هو الـ port الافتراضي عند الـ vendor (معلومة عامة مش من صفحة Esri)، وممكن يكون متغيّر في بيئتك، فاسأل الـ DBA.</p><p>الـ port الافتراضي عند الـ vendor لـ OpenSearch هو <code>9200</code> (REST/HTTP). تأكد منه في بيئتك.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>Basic authentication: اسم مستخدم وكلمة مرور. اعمل حساب مخصص للـ ArcGIS بصلاحيات قراءة بس على الـ indices المطلوبة (اقتراح منا).</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في OpenSearch. ArcGIS بيقرأ ويستعلم. مفيش geodatabase، فمفيش تعديل versioned.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>نشر الـ layer بيفشل</td><td>مفيش basic authentication</td><td>فعّل basic auth على الـ cluster وادخل بيانات الحساب</td></tr><tr><td>مفيش خيار Create geodatabase</td><td>مش مدعوم</td><td>استخدم database تانية</td></tr><tr><td>الإصدار مش شغال</td><td>خارج الإصدارات المدعومة</td><td>استخدم أحد: OpenSearch 2.12</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>استخدمه للقراءة والعرض والتحليل فقط.</li><li>لو محتاج تعديل: خزّن الداتا في database تانية.</li><li>حساب read-only مخصص.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-reqs-opensearch.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>الإصدارات المدعومة: OpenSearch 2.12.</li><li>الـ geodatabases غير مدعومة.</li><li>نشر web layers محتاج basic authentication.</li></ul>
+</section>
+<section class="topic" id="t-oracle" hidden><div class="eyebrow">Databases and data warehouses</div><h1>Oracle requirements</h1><p class="subtitle">متطلبات Oracle</p><p class="lead">ArcGIS Enterprise وArcGIS Pro بيتصلوا بـ <strong>Oracle</strong> وبـ <a href="https://doc.esri.com/en/arcgis-pro/3.7/help/data/geodatabases/overview/types-of-geodatabases.html" target="_blank" rel="noopener">enterprise geodatabases</a> فيه. Oracle أكتر database فيها تفاصيل (أنواع مكانية، pluggable databases، patches)، فالصفحة دي طويلة.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">إصدارات Oracle المدعومة</h2>
+<p>الإصدارات <strong>Standard Edition 2 (SE2)</strong> وـ <strong>Enterprise Edition (EE)</strong> هي الحد الأدنى المعتمد والمدعوم. التحديثات والـ patches اللاحقة مدعومة.</p>
+<ul><li>Oracle <strong>26ai</strong>، الإصدار 23.26.1.0.0 (<strong>Linux فقط</strong>)</li><li>Oracle <strong>19c</strong> (64-bit)، الإصدار 19.3.0.0</li></ul>
+<h2 id="os">أنظمة التشغيل المدعومة</h2>
+<p>لو الـ DBMS على نفس جهاز منتج ArcGIS: لازم الـ OS يحقق متطلبات المنتجين. لو على سيرفر منفصل: راجع Oracle.</p>
+<h3>متطلبات إضافية لمكتبة ST_Geometry (shape library)</h3>
+<p>Esri بتدعم أنظمة التشغيل دي لما تستخدم <strong>ST_Geometry shape library</strong> وتضبط <strong>Oracle external procedure (extproc)</strong> (بيخلّي Oracle ينادي مكتبة خارجية مكتوبة بـ C):</p>
+<ul><li>Red Hat Enterprise Linux (RHEL) Server 9</li><li>Oracle Linux 9</li><li>SUSE Linux Enterprise Server (SLES) 15</li><li>IBM AIX (64-bit) 7.2</li><li>Oracle Solaris (64-bit) 11.4</li><li>Windows Server 2025 Standard وDatacenter</li><li>Windows Server 2022 Standard وDatacenter</li><li>Windows Server 2019 Standard وDatacenter</li></ul>
+<ul><li>Windows 11 Pro وEnterprise: <strong>للتطوير فقط</strong>.</li><li>على Windows لازم جهاز Oracle عليه آخر <strong>Microsoft Visual C++ Redistributable</strong> لـ Visual Studio 2015 و2017 و2019 و2022.</li><li>التحديثات والـ service packs مدعومة إلا لو اتذكر غير كده، ولازم تكون مدعومة من مزود الـ OS.</li></ul>
+<div class="callout tip"><div class="callout-title">Oracle Exadata</div><p>دعم <strong>Oracle Exadata Database Machine</strong> بيتبع إرشادات Oracle: أي برنامج OEM بيدعم Oracle Linux وOracle RAC يبقى متوافق مع Exadata.</p></div>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li>في <strong>Oracle multitenant architecture</strong> تقدر تنشئ geodatabases <strong>فقط في pluggable databases</strong> (PDBs).</li><li><strong>Branch versioning غير مدعوم</strong> في user-schema geodatabases.</li><li>لازم <strong>Oracle Text</strong> مركّب. بيتركّب افتراضيًا، لكن ممكن يبقى ناقص لو التركيب مش default.</li><li>مع ملف اتصال <code>.sde</code> (database connection file) في ArcGIS Pro تقدر تعدّل فقط الداتا <strong>المسجلة (registered) مع الـ geodatabase</strong>. لتعديل أي داتا تانية في الـ database: انشر <strong>editable web feature layer</strong> يشاور عليها وعدّل من خلاله.</li></ul>
+<h2 id="patch">دعم الـ Oracle patches</h2>
+<ul><li>راجع Oracle Support لتوثيق patch sets وinterim patches.</li><li>Esri بتنصح بـ <strong>full database backup</strong> قبل أي patch. لو حاجة كانت شغالة وبطلت، ارجع للإصدار السابق واتصل بـ Oracle Support.</li></ul>
+<h2 id="cloud">دعم الـ Cloud</h2><p>للـ database services والـ databases المنشورة على cloud: راجع <a data-go="databases-in-cloud" href="#">Requirements for using ArcGIS with databases in the cloud</a>.</p>
+<h2 id="client">البرامج المطلوبة للاتصال</h2>
+<p>الأجهزة محتاجة Oracle client files من الـ vendor. <strong>استخدم أحدث Oracle client مدعوم</strong> لإصدار الـ database. الـ <strong>Oracle Instant Client</strong> متاح من My Esri.</p>
+<h2 id="spatial">الأنواع المكانية في Oracle (من صفحة الـ overview)</h2>
+<ul><li><strong>SDO_Geometry</strong> (Spatial Data Option): نوع Oracle الأصلي، تركيب طرف تالت منفصل.</li><li><strong>ST_Geometry</strong>: نوع Esri، بيتطلب geoprocessing tool للإعداد. الـ geodatabases بتركّبه تلقائيًا.</li></ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): Oracle multitenant</div><p>الـ DBA أنشأ geodatabase في الـ container database (CDB) الجذر. الصفحة: الـ geodatabases تتنشأ <strong>في pluggable database فقط</strong>. الحل: أنشئ pluggable database (PDB) وابنِ الـ geodatabase جواها.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>لو شغال بـ Oracle على Windows، آخر Visual C++ Redistributable ضروري على جهاز Oracle علشان ST_Geometry. ده شبه ما كان Pro محتاج .NET.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>Port افتراضي لـ Oracle listener: <code>1521</code> (معلومة عامة، مش من صفحة Esri).</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>مالك الـ geodatabase (sde أو user schema). في user-schema geodatabases مفيش branch versioning.</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في Oracle (SDO_Geometry أو ST_Geometry). التعديل عبر .sde للداتا المسجلة فقط. الـ geodatabase في PDB.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>إنشاء geodatabase بيفشل</td><td>في CDB جذر مش PDB</td><td>أنشئه في pluggable database</td></tr><tr><td>Text search مش شغال</td><td>Oracle Text مش مركّب</td><td>ركّبه</td></tr><tr><td>Branch versioning مش متاح</td><td>user-schema geodatabase</td><td>الصفحة بتقول إن branch versioning مش مدعوم في user-schema geodatabases؛ راجع نوع الـ geodatabase عندك</td></tr><tr><td>بعد patch حاجة بطلت</td><td>patch جديد</td><td>استرجع من backup وكلّم Oracle Support</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>Backup كامل قبل أي patch.</li><li>استخدم أحدث Oracle client مدعوم.</li><li>26ai على Linux فقط.</li><li>PDB للـ geodatabase.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-requirements-oracle.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>Oracle 26ai (Linux فقط) و19c.</li><li>Geodatabases في pluggable databases فقط.</li><li>Oracle Text لازم يكون مركّب.</li><li>user-schema geodatabases مفيهاش branch versioning.</li><li>Backup قبل patching.</li></ul>
+</section>
+<section class="topic" id="t-postgresql" hidden><div class="eyebrow">Databases and data warehouses</div><h1>PostgreSQL requirements</h1><p class="subtitle">متطلبات PostgreSQL</p><p class="lead">ArcGIS Enterprise وArcGIS Pro بيتصلوا بـ <strong>PostgreSQL</strong> وبـ <a href="https://doc.esri.com/en/arcgis-pro/3.7/help/data/geodatabases/overview/types-of-geodatabases.html" target="_blank" rel="noopener">enterprise geodatabases</a> فيه. ده الخيار مفتوح المصدر الأشهر ودايمًا بيتسأل عنه في مشاريع الـ utility.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">إصدارات PostgreSQL المدعومة</h2>
+<p>الحد الأدنى (كلها 64-bit، وكلها مع <strong>PostGIS 3.6.1</strong>). <strong>PostGIS</strong> هي إضافة (extension) بتضيف أنواع وعمليات مكانية لـ PostgreSQL.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>PostgreSQL</th><th>PostGIS</th></tr></thead><tbody><tr><td><strong>18.1</strong></td><td>3.6.1</td></tr><tr><td><strong>17.7</strong></td><td>3.6.1</td></tr><tr><td><strong>16.11</strong></td><td>3.6.1</td></tr><tr><td><strong>15.15</strong></td><td>3.6.1</td></tr><tr><td><strong>14.20</strong></td><td>3.6.1</td></tr></tbody></table></div>
+<p>الـ minor versions الأحدث مدعومة لكن مش معتمدة، إلا لو اتذكر غير كده.</p>
+<ul><li><strong>الترقية:</strong> لو الـ database فيها geodatabase، الترقية من PostgreSQL <strong>11.x أو أقدم</strong> محتاجة <code>pg_dump</code> وـ <code>pg_restore</code>. ده بيشيل حقول OID غير مستخدمة وغير مدعومة كانت هتمنع الترقية.</li><li><strong>نطاق الاعتماد:</strong> Esri بتختبر installers من PostgreSQL.org وبتعتمد وحدات <strong>PostGIS</strong> لكل إصدار. <strong>مفيش extensions تانية معتمدة.</strong> وفيه تركيب Windows مدعوم متاح من My Esri.</li></ul>
+<div class="callout tip"><div class="callout-title">يعني إيه certified وsupported؟</div><p><strong>Certified</strong> (معتمد) = Esri اختبرت الإصدار ده بنفسها. <strong>Supported</strong> (مدعوم) = لو حصلت مشكلة Esri هتساعدك حتى لو ما اختبرتش الإصدار بالتحديد. فلما الصفحة تقول "الـ service packs والـ patches مدعومة مش معتمدة" يعني: هتتساعد، لكن اتأكد من بيئة الاختبار قبل ما تطبّق على production.</p></div>
+<h2 id="os">أنظمة التشغيل لـ ST_Geometry</h2>
+<p>لو بتستخدم <strong>ST_Geometry</strong> (نوع Esri المكاني) لازم PostgreSQL cluster يشتغل على OS مختبر، وإصدار الـ OS يكون مدعوم من مزوده.</p>
+<h3>Linux (مختبر مع ST_Geometry)</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>نظام التشغيل</th><th>آخر update اتختبر</th></tr></thead><tbody><tr><td>Red Hat Enterprise Linux Server 8</td><td>Update 10</td></tr><tr><td>Red Hat Enterprise Linux Server 9</td><td>Update 7</td></tr><tr><td>AlmaLinux 8</td><td>Update 10</td></tr><tr><td>AlmaLinux 9</td><td>Update 7</td></tr><tr><td>SUSE Linux Enterprise Server 15</td><td>Service Pack 7</td></tr><tr><td>Ubuntu Server 24.04 LTS</td><td>24.04.4</td></tr><tr><td>Ubuntu Server 22.04 LTS</td><td>22.04.5</td></tr><tr><td>Oracle Linux 8</td><td>Update 10</td></tr><tr><td>Oracle Linux 9</td><td>Update 7</td></tr><tr><td>Rocky Linux 8</td><td>Update 10</td></tr><tr><td>Rocky Linux 9</td><td>Update 7</td></tr></tbody></table></div>
+<ul><li>ST_Geometry على Linux بيحتاج <code>libstdc++.so.6</code> إصدار <strong>6.0.29 أو أحدث</strong>. لو ناقص: انسخه مع <code>st_geometry.so</code> من My Esri.</li><li>الـ updates السابقة واللاحقة مدعومة إلا لو اتذكر غير كده.</li><li><strong>Esri Technical Support مبقاش بيغطي CentOS ولا Scientific Linux.</strong></li></ul>
+<h3>Microsoft Windows</h3>
+<p>ST_Geometry بيحتاج آخر <strong>Microsoft Visual C++ Redistributable</strong> لـ Visual Studio 2015 إلى 2022.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الغرض</th><th>النظام (آخر update مختبر: April 2026)</th></tr></thead><tbody><tr><td>Production</td><td>Windows Server 2025 Standard وDatacenter<br>Windows Server 2022 Standard وDatacenter<br>Windows Server 2019 Standard وDatacenter</td></tr><tr><td>اختبار أساسي وتطوير تطبيقات</td><td>Windows 11 Pro وEnterprise</td></tr></tbody></table></div>
+<p>Windows 11 مدعوم للاختبار الأساسي والتطوير فقط.</p>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li>مع ملف اتصال <code>.sde</code> (database connection file) في ArcGIS Pro تقدر تعدّل فقط الداتا <strong>المسجلة (registered) مع الـ geodatabase</strong>. لتعديل أي داتا تانية في الـ database: انشر <strong>editable web feature layer</strong> يشاور عليها وعدّل من خلاله.</li></ul>
+<h3>EDB Postgres Advanced Server</h3>
+<ul><li>مدعوم بناءً على نفس الحد الأدنى لـ PostgreSQL وPostGIS.</li><li>تقدر تنشئ geodatabase بأداة <strong>Create Enterprise Geodatabase</strong>.</li><li><strong>نوع PostGIS المكاني فقط</strong> مدعوم، مش ST_Geometry.</li></ul>
+<h2 id="cloud">دعم الـ Cloud</h2><p>للـ database services والـ databases المنشورة على cloud: راجع <a data-go="databases-in-cloud" href="#">Requirements for using ArcGIS with databases in the cloud</a>.</p>
+<h2 id="client">الاتصال (Client connections)</h2>
+<p><strong>ArcGIS Server وArcGIS Pro بيشملوا مكتبات PostgreSQL client اللازمة</strong> للاتصال. يعني ما تحتاجش تركّب client منفصل (عكس Oracle وSQL Server وDb2).</p>
+<h2 id="spatial">الأنواع المكانية (من الـ overview)</h2>
+<p>بيدعم PostGIS (geometry وgeography، تركيب منفصل) وـ ST_Geometry. تعليمات الإعداد موجودة لـ Linux وWindows. المستخدمين اللي بينشئوا objects لازم <strong>username يطابق اسم الـ schema</strong>.</p>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): FTTH على PostgreSQL</div><p>شركة اتصالات هتبني geodatabase لشبكة الألياف على PostgreSQL مفتوح المصدر. تركّب PostgreSQL 17.7 مع PostGIS 3.6.1. لو حد قال "هنضيف extension تحليل تاني"، الصفحة بتقول: Esri معتمدة PostGIS بس، مفيش extensions تانية معتمدة. يعني دعم Esri مش هيغطي مشاكل بسببها.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>Pro وServer بيجيبوا معاهم PostgreSQL client libraries، فمش هتحتاج تروح تحمّل client زي Oracle. ده بيخلّي PostgreSQL أسهل في الإعداد على الأجهزة الجديدة.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>Port افتراضي لـ PostgreSQL: <code>5432</code> (معلومة عامة، مش من صفحة Esri). تأكد من <code>pg_hba.conf</code> عشان يسمح لـ ArcGIS Server وPro بالاتصال (معلومة عامة عن PostgreSQL).</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>المستخدم اللي بينشئ objects: username = اسم الـ schema. EDB Advanced Server: PostGIS فقط.</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في PostgreSQL (PostGIS أو ST_Geometry). التعديل عبر .sde للمسجل فقط.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>الترقية من 11.x فشلت</td><td>حقول OID غير مدعومة</td><td>استخدم pg_dump وpg_restore</td></tr><tr><td>ST_Geometry مش شغال على Linux</td><td>libstdc++.so.6 أقدم من 6.0.29</td><td>انسخه مع st_geometry.so من My Esri</td></tr><tr><td>مشكلة بسبب extension تالت</td><td>غير معتمد</td><td>شيله أو اقبل إن الدعم محدود</td></tr><tr><td>ST_Geometry على EDB</td><td>مش مدعوم</td><td>استخدم PostGIS</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>أحدث minor version للإصدار.</li><li>PostGIS 3.6.1.</li><li>ما تضيفش extensions غير PostGIS على قاعدة الـ geodatabase.</li><li>CentOS وScientific Linux خارج الدعم.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-requirements-postgresql.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>14.20 لـ 18.1 مع PostGIS 3.6.1.</li><li>PostGIS فقط هو المعتمد؛ مفيش extensions تانية.</li><li>ST_Geometry على Linux/Windows محدد بالجداول.</li><li>الـ clients بتيجي مع ArcGIS Server وPro.</li><li>EDB Advanced Server: PostGIS فقط.</li></ul>
+</section>
+<section class="topic" id="t-sap-hana" hidden><div class="eyebrow">Databases and data warehouses</div><h1>SAP HANA requirements</h1><p class="subtitle">متطلبات SAP HANA</p><p class="lead">ArcGIS Pro وArcGIS Enterprise بيتصلوا بـ <strong>SAP HANA</strong> وبـ <a href="https://doc.esri.com/en/arcgis-pro/3.7/help/data/geodatabases/overview/types-of-geodatabases.html" target="_blank" rel="noopener">enterprise geodatabases</a> فيه. SAP HANA database في الذاكرة (in-memory) بتخزن بالأعمدة.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">إصدارات SAP HANA المدعومة</h2>
+<p><strong>SAP HANA 2.0 SPS 07</strong> وأي service pack أحدث. (<strong>SPS</strong> = Support Package Stack.)</p>
+<h2 id="os">أنظمة التشغيل</h2>
+<p>SAP HANA متاحة في الـ cloud أو كـ <strong>preconfigured system</strong> على Linux. اتصل بـ SAP للتكوينات المتاحة.</p>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li><strong>Branch versioned data</strong> محتاجة <strong>SAP HANA 2.0 SPS 08 rev 81</strong> أو service pack أحدث.</li><li>مع SPS 08 rev 81 أو أحدث ووجود geodatabase في الـ database: امنح المستخدمين <code>EXECUTE ON ACQUIRE_APPLICATION_LOCK</code> و<code>EXECUTE ON RELEASE_APPLICATION_LOCK</code>.</li><li>مع ملف اتصال <code>.sde</code> (database connection file) في ArcGIS Pro تقدر تعدّل فقط الداتا <strong>المسجلة (registered) مع الـ geodatabase</strong>. لتعديل أي داتا تانية في الـ database: انشر <strong>editable web feature layer</strong> يشاور عليها وعدّل من خلاله.</li></ul>
+<h2 id="cloud">دعم الـ Cloud</h2><p>للـ database services والـ databases المنشورة على cloud: راجع <a data-go="databases-in-cloud" href="#">Requirements for using ArcGIS with databases in the cloud</a>.</p>
+<h2 id="client">البرامج المطلوبة للاتصال</h2>
+<ul><li>الأجهزة (Pro وServer) لازم يكون عليها <strong>SAP HANA client</strong> مدعوم ومتضبّط.</li><li>مستخدمو SAP الحاليين بيحمّلوه من <strong>SAP Support Portal</strong> تحت Software Downloads.</li><li>ركّب إصدار client مدعوم لإصدار SAP HANA اللي بتتصل بيه. <strong>استخدم أحدث client</strong> مدعوم.</li></ul>
+<h2 id="notes">ملاحظات من صفحة الـ overview</h2>
+<ul><li>التخزين <strong>columnar</strong> (بالأعمدة) فمش محتاج <strong>spatial index</strong>.</li><li>مفيش user-defined indexes بتديرها.</li><li>الـ spatial references لازم تكون موجودة في الـ <strong>system table</strong>.</li><li><strong>SRID 4326</strong> (WGS 84) بيتصرف بشكل مختلف عن المتوقع في ArcGIS.</li></ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): بيانات أصول في SAP</div><p>شركة مرافق بتدير الأصول (المحابس والمضخات) في SAP، والمواقع في SAP HANA. عايزين نفس الأصول تظهر على خريطة. تركّب SAP HANA client على ArcGIS Pro وServer، وتنشر map image layer. لو عايزين تعدّل مع branch versioning: SPS 08 rev 81 + صلاحيتين EXECUTE.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>لو اتعودت تعمل Add Spatial Index بعد ما تنشئ feature class، هنا الأمر مختلف: SAP HANA columnar فمش محتاج.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>Port SAP HANA بيعتمد على رقم الـ instance (الصيغة <code>3&lt;instance&gt;15</code>، مثلاً <code>30015</code> لـ instance 00). معلومة عامة، مش من صفحة Esri.</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>المستخدمين محتاجين EXECUTE على ACQUIRE_APPLICATION_LOCK وRELEASE_APPLICATION_LOCK لو branch versioning.</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في SAP HANA (columnar). التعديل عبر .sde للمسجل فقط.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>Branch versioning مش شغال</td><td>أقل من SPS 08 rev 81 أو الصلاحيات ناقصة</td><td>رقّي وامنح الصلاحيتين</td></tr><tr><td>SRID 4326 بتديني نتايج غريبة</td><td>سلوك مختلف في ArcGIS</td><td>راجع الـ spatial reference في system table</td></tr><tr><td>مش قادر أتصل</td><td>client مش مركّب أو إصداره غلط</td><td>ركّب أحدث client مدعوم من SAP Support Portal</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>أحدث SAP HANA client مدعوم.</li><li>SPS 08 rev 81 لو محتاج branch versioning.</li><li>ما تنشئش spatial index (مش محتاج).</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/database-requirements-sap-hana.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>SAP HANA 2.0 SPS 07 وما بعده.</li><li>Branch versioning: SPS 08 rev 81.</li><li>صلاحيتين EXECUTE على الـ application lock.</li><li>Client من SAP Support Portal.</li><li>مش محتاج spatial index.</li></ul>
+</section>
+<section class="topic" id="t-teradata" hidden><div class="eyebrow">Databases and data warehouses</div><h1>Teradata Vantage requirements</h1><p class="subtitle">متطلبات Teradata</p><p class="lead"><strong>Teradata Vantage</strong> data warehouse ضخم. ArcGIS Pro وServer يتصلوا بيه، لكن بقيود: مفيش geodatabase، ولازم عمود اسمه SHAPE.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="versions">الإصدارات المدعومة</h2>
+<ul><li>Vantage <strong>Advanced SQL Engine 17.10</strong></li><li>Vantage <strong>Advanced SQL Engine 17.0</strong></li></ul>
+<p>الـ service packs مدعومة لكن مش معتمدة.</p>
+<div class="callout tip"><div class="callout-title">يعني إيه certified وsupported؟</div><p><strong>Certified</strong> (معتمد) = Esri اختبرت الإصدار ده بنفسها. <strong>Supported</strong> (مدعوم) = لو حصلت مشكلة Esri هتساعدك حتى لو ما اختبرتش الإصدار بالتحديد. فلما الصفحة تقول "الـ service packs والـ patches مدعومة مش معتمدة" يعني: هتتساعد، لكن اتأكد من بيئة الاختبار قبل ما تطبّق على production.</p></div>
+<h2 id="limits">متطلبات وقيود الـ database</h2>
+<ul><li>اتصالات <strong>ODBC</strong> لازم تستخدم <strong>Teradata session mode</strong> وـ <strong>Native Large Object Support</strong>.</li><li><strong>الـ geodatabase functionality مش مدعومة.</strong></li><li>أعمدة الـ spatial لازم اسمها أو alias بتاعها <code>SHAPE</code> عشان ArcGIS يعرفها.</li><li>Teradata <strong>مش مدعوم كـ data store item</strong> في ArcGIS Enterprise.</li><li>Teradata <strong>مش مدعوم</strong> مع ArcGIS Enterprise on Kubernetes.</li></ul>
+<h2 id="cloud">دعم الـ Cloud</h2><p>للـ database services والـ databases المنشورة على cloud: راجع <a data-go="databases-in-cloud" href="#">Requirements for using ArcGIS with databases in the cloud</a>.</p>
+<h2 id="client">البرامج المطلوبة للاتصال</h2>
+<p>الجهاز اللي عليه ArcGIS Pro أو Server محتاج <strong>database client files</strong> من الـ vendor (انظر صفحة Database clients). وصفحة الـ overview بتذكر: تركيب <strong>GSS client</strong> وـ <strong>ICU library</strong> وـ <strong>ODBC driver</strong> بترتيب محدد (GSS = Generic Security Services، ICU = International Components for Unicode).</p>
+<h2 id="guides">إرشادات التعامل (من صفحة الـ overview)</h2>
+<ul><li>ArcGIS بينشئ الجداول <strong>فقط في database المستخدم نفسه</strong>.</li><li>الـ spatial index بيتعمل بـ <strong>tessellation functions</strong> بتاعت Teradata.</li><li>لازم unique ID field، وأدوات ArcGIS ما تقدرش تنشئ rows في Teradata.</li><li>للداتا الكبيرة استخدم query layers أو database views أو definition queries.</li><li>Backup لـ <code>SPATIAL_REF_SYS</code> وـ <code>GEOMETRY_COLUMNS</code> قبل upgrade.</li></ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): تقارير تحليلية ضخمة</div><p>شركة عندها data warehouse على Teradata بمليارات الصفوف لحركة العملاء، وعمود موقع. عايزين خريطة حرارية. تنشر query layer بتجيب جزء بس (لمنطقة أو شهر) بدل الجدول كله، وتتأكد إن عمود الموقع اسمه SHAPE. ما تحاولش تعمل geodatabase عليه: مش مدعوم.</p></div>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>Query Layers في Pro بتخليك تكتب SQL وتتعامل مع الجدول كـ layer من غير ما تنقل الداتا. ده بالظبط الحل المناسب لـ warehouse ضخم.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>Port افتراضي لـ Teradata: <code>1025</code> (معلومة عامة، مش من صفحة Esri).</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>ArcGIS بينشئ جداول في database المستخدم نفسه، فصلاحيات المستخدم بتحدد أين.</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا بتفضل في الـ warehouse، ArcGIS بيقرأ عن طريق ODBC. مفيش geodatabase.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>الـ layer مش بتتعرف</td><td>عمود الـ spatial مش اسمه SHAPE</td><td>سمّيه أو اعمل alias SHAPE</td></tr><tr><td>الاتصال بيفشل</td><td>session mode أو LOB support غلط</td><td>ضبط ODBC على session mode وNative LOB</td></tr><tr><td>الخريطة بطيئة</td><td>الجدول ضخم بدون تصفية</td><td>query layer أو view أو definition query</td></tr><tr><td>upgrade كسر المراجع المكانية</td><td>مفيش backup</td><td>backup للجدولين قبل الـ upgrade</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>Query layers للداتا الكبيرة.</li><li>اسم SHAPE.</li><li>Backup للجدولين.</li><li>ما تتوقعش geodatabase.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/data-warehouse-requirements-teradata.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>Advanced SQL Engine 17.10 و17.0.</li><li>ODBC: session mode + Native LOB.</li><li>مفيش geodatabase، مش data store item، مش Kubernetes.</li><li>عمود SHAPE.</li><li>للداتا الكبيرة: query layers.</li></ul>
+</section>
+<section class="topic" id="t-databases-in-cloud" hidden><div class="eyebrow">Databases and data warehouses</div><h1>Databases in the cloud</h1><p class="subtitle">الـ databases على الـ cloud</p><p class="lead">الصفحة دي بتشرح متطلبات استخدام ArcGIS مع <strong>databases على الـ cloud</strong>: على VM بتديرها أنت، أو كخدمة مُدارة (DBaaS) أو data warehouse.</p>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+
+<h2 id="two-types">نوعين من الـ cloud databases</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>النوع</th><th>إيه هو</th><th>مين مسؤول عن إيه</th></tr></thead><tbody><tr><td><strong>Databases on cloud VMs</strong> (database على virtual machine في الـ cloud)</td><td>أنت بتركّب الـ database على VM بتتحكم فيها، أو بتشغّل image جاهزة فيها database</td><td>أنت عادةً مسؤول عن الصيانة</td></tr><tr><td><strong>DBaaS وData warehouses</strong> (قاعدة بيانات كخدمة / مخزن بيانات)</td><td>خدمة جاهزة من المزود (Database-as-a-Service)</td><td>مفيش وصول للجهاز اللي تحت، ومفيش مسؤولية عن patching الـ OS أو الـ database. المزود ممكن يغيّر features أو options وقت التحديث، وده ممكن يأثر على شغلك</td></tr></tbody></table></div>
+<div class="callout danger"><div class="callout-title">مكان الـ clients (أهم قاعدة)</div><p>الـ clients لازم تشتغل <strong>في نفس الـ cloud وبشكل مثالي نفس الـ region</strong> اللي فيه الـ database. الاتصال من on-premises أو من cloud تاني أو من region مختلف <strong>غالبًا أداءه ضعيف وممكن يحصل time out</strong>.</p></div>
+<div class="callout tip"><div class="callout-title">Tip من Esri: Supported Environment Policy</div><p>كل صفحة من صفحات الـ databases بتبدأ بتنبيه بيحيلك لـ <strong>Esri Supported Environment Policy</strong> (سياسة البيئات المدعومة). فيها تفاصيل الـ certification (الاعتماد) والدعم للـ hardware وـ operating systems وـ databases والتقنيات التالتة. المعلومات في الصفحة دي بتنطبق على <strong>ArcGIS Enterprise 12.1</strong> وـ <strong>ArcGIS Pro 3.7</strong>.</p></div>
+<h2 id="installed">دعم الـ databases المركّبة على الـ cloud</h2>
+<ul><li>أي cloud platform مدعومة لو الـ VMs بتاعتها بتحقق متطلبات الـ OS ومواصفات النظام لـ ArcGIS clients والـ database.</li><li>الدعم بيفترض إن الـ VMs بتتصرف زي أجهزة فيزيائية مكافئة on-premises. Esri غالبًا بتعيد إنتاج المشكلة على hardware مماثل on-premises.</li><li><strong>Oracle Base Database Service</strong> معتمد للاستخدام مع ArcGIS.</li></ul>
+<h2 id="services">خدمات الـ database السحابية المدعومة</h2>
+<p>Esri بتوفر أدوات نشر (deployment tools) وـ images لـ <strong>AWS</strong> وـ <strong>Microsoft Azure</strong>، وهما الموصى بيهم. الـ clouds التانية بتتدعم فقط في المشاكل الخاصة بـ ArcGIS اللي تتعاد إنتاجها on-premises.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الخدمة</th><th>الإصدارات (الحد الأدنى)</th><th>ملاحظات</th></tr></thead><tbody><tr><td><strong>Amazon Aurora</strong> (متوافق مع PostgreSQL)</td><td>14.19، 15.14، 16.10، 17.6</td><td>AWS بتركّب PostGIS متوافق</td></tr><tr><td><strong>Amazon RDS for Oracle</strong></td><td>مفيش إصدارات مذكورة</td><td>—</td></tr><tr><td><strong>Amazon RDS for PostgreSQL</strong></td><td>14.20، 15.15، 16.11، 17.7، 18.1</td><td>إصدارات PostGIS حسب دعم AWS</td></tr><tr><td><strong>Amazon RDS for SQL Server</strong></td><td>2019، 2022</td><td>—</td></tr><tr><td><strong>Google Cloud SQL for PostgreSQL</strong></td><td>14.20، 15.15، 16.11، 17.7، 18.1</td><td>إصدارات PostGIS حسب دعم Google Cloud</td></tr><tr><td><strong>Google Cloud SQL for SQL Server</strong></td><td>2019، 2022</td><td>—</td></tr><tr><td><strong>Microsoft Azure Database for PostgreSQL (Flexible Server)</strong></td><td>14.20، 15.15، 16.11، 17.7، 18.1</td><td>إصدارات PostGIS حسب دعم Azure</td></tr><tr><td><strong>Microsoft Azure SQL Database</strong> أو <strong>SQL Managed Instance</strong></td><td>الإصدار 12</td><td>—</td></tr><tr><td><strong>Oracle Autonomous AI Database</strong></td><td>19c و26ai</td><td>يشمل Autonomous AI Lakehouse وAutonomous AI Transaction Processing</td></tr><tr><td><strong>SAP HANA Cloud</strong></td><td>مفيش إصدار مذكور</td><td>—</td></tr></tbody></table></div>
+<p>أدوات الـ geoprocessing بتشتغل على عروض DBaaS المكافئة إلا لو ملاحظات استخدام الأداة بتقول غير كده. مثلاً أدوات PostgreSQL بتشتغل عمومًا على RDS وAurora وAzure وCloud SQL for PostgreSQL.</p>
+<h2 id="limits">القيود على الـ DBaaS</h2>
+<ul><li><strong>PostGIS 3.5.3 و3.6.0 غير مدعومين</strong> (بسبب PostGIS issue 5978).</li><li>Azure Database for PostgreSQL <strong>elastic clusters</strong> مدعومة، لكن <strong>الـ geodatabases غير مدعومة</strong> عليها.</li><li><strong>ST_Geometry ما يتحملش في DBaaS</strong>. فقط أنواع <strong>PostGIS</strong> تشتغل مع Aurora وRDS وCloud SQL for PostgreSQL وAzure PostgreSQL. وفقط <strong>SDO_Geometry</strong> يشتغل مع RDS for Oracle وAutonomous AI Transaction Processing.</li><li>ثلاث functions ناقصة في الـ geodatabases على RDS for Oracle وAutonomous AI Transaction Processing: <code>GDB_UTIL.get_extent()</code> وـ <code>GDB_UTIL.geometry_type</code> وـ <code>GDB_UTIL.spatial_ref_info()</code>.</li><li>أدوات AWS من Esri <strong>ما بتنشئش</strong> RDS for Oracle instances. استخدم أدوات AWS.</li><li>من غير أدوات النشر من Esri: أنشئ الـ geodatabases بأداة <strong>Enable Enterprise Geodatabase</strong>. <strong>ما تستخدمش Create Enterprise Geodatabase.</strong></li><li>على RDS for SQL Server وCloud SQL for SQL Server وAzure SQL Database وAzure SQL Managed Instance: <strong>sde-schema geodatabases فقط</strong> مدعومة.</li><li><strong>OS authentication</strong> (المصادقة بنظام التشغيل) غير مدعوم لمعظم DBaaS. فيه خيارات <strong>Microsoft Entra ID</strong> لـ Azure SQL Database وSQL Managed Instance.</li><li>SAP HANA Cloud geodatabases محتاجة EXECUTE على <code>ACQUIRE_APPLICATION_LOCK</code> و<code>RELEASE_APPLICATION_LOCK</code> للمستخدمين المتصلين.</li><li>المزودين ممكن يغيّروا settings حتى في minor releases، وده ممكن يأثر على وصول ArcGIS. Esri هتحاول تصلّح، والتوقيت بيتقيّم حالة بحالة.</li></ul>
+<div class="callout real"><div class="callout-title">سيناريو واقعي (مثال توضيحي): ArcGIS Enterprise على AWS مع RDS for PostgreSQL</div><p>نشرت ArcGIS Enterprise في region فرانكفورت وعايز enterprise geodatabase. تختار RDS for PostgreSQL 17.7 في <strong>نفس الـ region</strong> بدل on-premises (لأن الاتصال البعيد بطيء وممكن time out). الـ spatial type: PostGIS فقط (ST_Geometry مش هيتحمّل). تأكد إن PostGIS مش 3.5.3 ولا 3.6.0. لو أنشأت الـ instance بنفسك من غير أدوات Esri: استخدم Enable Enterprise Geodatabase مش Create.</p></div>
+<h2 id="warehouses">الـ Cloud data warehouses المدعومة</h2>
+<ul><li><strong>Amazon Redshift</strong></li><li><strong>Google BigQuery</strong></li><li><strong>Snowflake</strong></li></ul>
+<p><strong>الـ geodatabases غير مدعومة في أي منهم.</strong></p>
+<h2 id="client">البرامج المطلوبة للاتصال</h2>
+<p>الـ database client files من كل vendor بتتيح التواصل مع الـ database. ثبّت <strong>أحدث client</strong> مدعوم لإصدار الـ database.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الاستثناء</th><th>المطلوب</th></tr></thead><tbody><tr><td>SAP HANA Cloud</td><td>ODBC client <strong>2.15.17 أو أحدث</strong>. ثبّت الـ ArcGIS client أقرب ما يمكن لـ SAP HANA deployment</td></tr><tr><td>Azure SQL Database وSQL Managed Instance</td><td>على الأقل أدنى إصدار ODBC بتدعمه Microsoft</td></tr><tr><td>BigQuery</td><td>أحدث <strong>Simba ODBC driver</strong> من Google</td></tr><tr><td>Snowflake (key-pair authentication)</td><td>ODBC driver <strong>3.4.0 أو أحدث</strong></td></tr></tbody></table></div>
+<h3>Clients بتتوفر تلقائيًا</h3>
+<ul><li>Esri Azure images لـ ArcGIS Enterprise وArcGIS Pro فيها clients قواعد Azure اللازمة.</li><li>أدوات نشر Esri على AWS بتركّب clients لعروض Amazon RDS المدعومة.</li><li>ArcGIS Enterprise on Kubernetes فيه client files للـ databases والـ warehouses المدعومة له.</li></ul>
+<div class="callout tip"><div class="callout-title">جسر من ArcGIS Pro</div><p>لو Pro على لاب توب في مكتبك وDB في region على الـ cloud، الاتصال هيتبطأ أو يفصل. الأنسب: Pro على VM (مثلاً ArcGIS Pro على Azure VM) في نفس الـ region.</p></div>
+
+<h2 id="pillars">الـ 5 محاور</h2>
+<h3 id="p-a">A. Network &amp; Ports: الشبكة والمنافذ</h3>
+<p>الصفحة ما بتحددش ports. القاعدة: الـ client والـ DB في نفس الـ cloud/region، والـ security groups (قواعد firewall في الـ cloud) لازم تسمح لـ port الـ database بين الـ ArcGIS machines والـ DB (معلومة عامة).</p>
+<h3 id="p-b">B. Identity &amp; Service Accounts: الهوية والحسابات</h3>
+<p>OS authentication غير مدعوم لمعظم DBaaS. Azure SQL: Microsoft Entra ID. Snowflake: key-pair authentication بيتطلب ODBC 3.4.0+. SAP HANA Cloud: EXECUTE على الـ lock procedures.</p>
+<h3 id="p-c">C. Storage &amp; Data Flow: التخزين ومسار الداتا</h3>
+<p>الداتا في الـ cloud DB. الـ geodatabases مدعومة في معظم DBaaS (بشروط) وغير مدعومة في Redshift وBigQuery وSnowflake وElastic clusters.</p>
+<h3 id="p-d">D. Error Scenarios &amp; Failure Points: الأعطال</h3>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>العرض</th><th>السبب المحتمل</th><th>العلاج</th></tr></thead><tbody><tr><td>الاتصال بطيء أو time out</td><td>client خارج الـ cloud أو في region مختلف</td><td>انقل الـ client لنفس cloud وregion</td></tr><tr><td>ST_Geometry فشل</td><td>غير مدعوم في DBaaS</td><td>استخدم PostGIS (أو SDO_Geometry لـ Oracle)</td></tr><tr><td>Create Enterprise Geodatabase فشل</td><td>مش مدعوم من غير أدوات Esri</td><td>استخدم Enable Enterprise Geodatabase</td></tr><tr><td>مشاكل PostGIS بعد إنشاء instance</td><td>PostGIS 3.5.3 أو 3.6.0</td><td>استخدم إصدار غير هذين</td></tr><tr><td>الاتصال بـ BigQuery بيفشل</td><td>driver قديم</td><td>أحدث Simba ODBC</td></tr></tbody></table></div>
+<h3 id="p-e">E. Best Practices vs Defaults: الممارسات الصحيحة</h3>
+<ul><li>كل المكونات في نفس cloud وregion.</li><li>AWS وAzure هما الموصى بيهم.</li><li>أحدث client مدعوم.</li><li>راقب تغييرات المزود في الـ minor releases.</li></ul>
+<h2 id="resources">المراجع الرسمية</h2>
+<ul dir="ltr" style="text-align:left"><li><a href="https://doc.esri.com/en/arcgis-enterprise/latest/plan/databases-in-the-cloud.html" target="_blank" rel="noopener">Esri page</a></li><li><a href="https://links.esri.com/esri-supported-env-policy" target="_blank" rel="noopener">Esri Supported Environment Policy</a></li></ul>
+<h2 id="key-takeaways">Key takeaways: أهم النقاط</h2>
+<ul><li>نوعين: database على VM (مسؤوليتك) وDBaaS/warehouse (المزود مسؤول).</li><li>الـ clients في نفس cloud وregion.</li><li>AWS وAzure موصى بيهم.</li><li>ST_Geometry مش في DBaaS: PostGIS أو SDO_Geometry.</li><li>Redshift وBigQuery وSnowflake: مفيش geodatabase.</li></ul>
+</section>
 
     <div class="pager" id="pager"></div>
     <div class="disclaimer">شرح تعليمي مبني على documentation الرسمية بتاعة Esri (ArcGIS Enterprise 12.1 على Windows وLinux). الصفحة دي مش تابعة لـ Esri ومش بديل عن الـ documentation الرسمية؛ أي رقم أو أمر هتنفذه على بيئة production راجعه الأول مع صفحة الإصدار بتاعك. ArcGIS اسم تجاري لشركة Esri.</div>
@@ -3308,7 +4234,7 @@ Invoke-RestMethod -Uri "https://$($server):6443/arcgis/rest/info/healthCheck?f=j
 <script>
 (function(){
 "use strict";
-var NAV = [{"id": "start", "title": "Start here", "topics": [{"id": "glossary", "title": "IT foundations and glossary", "ar": "أساسيات الـ IT وقاموس المصطلحات من الصفر"}]}, {"id": "intro", "title": "Introduction", "topics": [{"id": "what-is", "title": "What is ArcGIS Enterprise?", "ar": "إيه هو ArcGIS Enterprise"}]}, {"id": "choose", "title": "Choosing a platform", "topics": [{"id": "agol-vs-enterprise", "title": "ArcGIS Online vs Enterprise", "ar": "الفرق والاختيار بينهم"}]}, {"id": "plan", "title": "Planning a deployment", "topics": [{"id": "evaluate-needs", "title": "Evaluate your organization's needs", "ar": "قيّم احتياجاتك قبل التصميم"}, {"id": "base-deployment-plan", "title": "Base ArcGIS Enterprise deployment", "ar": "الـ base deployment وأنماطه"}, {"id": "additional-servers", "title": "Additional server deployment", "ar": "الـ servers الإضافية"}, {"id": "server-extensions", "title": "Server extensions", "ar": "الـ extensions والـ editions"}]}, {"id": "req", "title": "System requirements and ports", "topics": [{"id": "system-requirements", "title": "ArcGIS Enterprise system requirements", "ar": "متطلبات النظام: الأجهزة والـ OS والمتصفحات"}, {"id": "coordinate-systems", "title": "Coordinate system requirements", "ar": "ملفات الـ coordinate systems على السيرفر"}, {"id": "scene-viewer", "title": "Scene Viewer requirements", "ar": "متطلبات عرض الـ 3D"}, {"id": "ports", "title": "Ports used by ArcGIS Enterprise", "ar": "المنافذ (ports) ومصفوفة التواصل"}]}, {"id": "dep", "title": "Deployment scenarios", "topics": [{"id": "deployment-scenarios", "title": "Deployment scenarios", "ar": "نظرة عامة والمصطلحات"}, {"id": "single-machine", "title": "Single-machine deployment", "ar": "site على machine واحدة"}, {"id": "single-machine-proxy", "title": "Single machine with reverse proxy", "ar": "machine واحدة مع reverse proxy"}, {"id": "multi-machine-wa", "title": "Multiple machines with Web Adaptor", "ar": "أكتر من machine مع Web Adaptor"}, {"id": "multi-machine-lb", "title": "Multiple machines with load balancer", "ar": "أكتر من machine مع load balancer"}]}];
+var NAV = [{"id": "start", "title": "Start here", "topics": [{"id": "glossary", "title": "IT foundations and glossary", "ar": "أساسيات الـ IT وقاموس المصطلحات من الصفر"}]}, {"id": "intro", "title": "Introduction", "topics": [{"id": "what-is", "title": "What is ArcGIS Enterprise?", "ar": "إيه هو ArcGIS Enterprise"}]}, {"id": "choose", "title": "Choosing a platform", "topics": [{"id": "agol-vs-enterprise", "title": "ArcGIS Online vs Enterprise", "ar": "الفرق والاختيار بينهم"}]}, {"id": "plan", "title": "Planning a deployment", "topics": [{"id": "evaluate-needs", "title": "Evaluate your organization's needs", "ar": "قيّم احتياجاتك قبل التصميم"}, {"id": "base-deployment-plan", "title": "Base ArcGIS Enterprise deployment", "ar": "الـ base deployment وأنماطه"}, {"id": "additional-servers", "title": "Additional server deployment", "ar": "الـ servers الإضافية"}, {"id": "server-extensions", "title": "Server extensions", "ar": "الـ extensions والـ editions"}]}, {"id": "req", "title": "System requirements and ports", "topics": [{"id": "system-requirements", "title": "ArcGIS Enterprise system requirements", "ar": "متطلبات النظام: الأجهزة والـ OS والمتصفحات"}, {"id": "coordinate-systems", "title": "Coordinate system requirements", "ar": "ملفات الـ coordinate systems على السيرفر"}, {"id": "scene-viewer", "title": "Scene Viewer requirements", "ar": "متطلبات عرض الـ 3D"}, {"id": "ports", "title": "Ports used by ArcGIS Enterprise", "ar": "المنافذ (ports) ومصفوفة التواصل"}]}, {"id": "dep", "title": "Deployment scenarios", "topics": [{"id": "deployment-scenarios", "title": "Deployment scenarios", "ar": "نظرة عامة والمصطلحات"}, {"id": "single-machine", "title": "Single-machine deployment", "ar": "site على machine واحدة"}, {"id": "single-machine-proxy", "title": "Single machine with reverse proxy", "ar": "machine واحدة مع reverse proxy"}, {"id": "multi-machine-wa", "title": "Multiple machines with Web Adaptor", "ar": "أكتر من machine مع Web Adaptor"}, {"id": "multi-machine-lb", "title": "Multiple machines with load balancer", "ar": "أكتر من machine مع load balancer"}]}, {"id": "storage-g", "title": "Data storage", "topics": [{"id": "data-storage-intro", "title": "Introduction to data storage", "ar": "System storage مقابل User storage"}, {"id": "required-storage", "title": "Required system storage", "ar": "المخازن المطلوبة للـ base deployment والـ backup"}, {"id": "capability-storage", "title": "Capability-based system storage", "ar": "Graph وRaster وSpatiotemporal stores"}, {"id": "user-storage", "title": "User storage", "ar": "databases وfolders وcloud stores"}, {"id": "system-directories", "title": "Options for system directories", "ar": "أماكن الـ content directory والـ config store"}]}, {"id": "dbs", "title": "Databases and data warehouses", "topics": [{"id": "dbms-support", "title": "Supported databases and data warehouses", "ar": "خريطة الـ databases المدعومة"}, {"id": "dameng", "title": "Dameng requirements", "ar": "متطلبات Dameng"}, {"id": "elasticsearch", "title": "Elasticsearch requirements", "ar": "متطلبات Elasticsearch"}, {"id": "db2", "title": "IBM Db2 requirements", "ar": "متطلبات IBM Db2"}, {"id": "sqlserver", "title": "Microsoft SQL Server requirements", "ar": "متطلبات SQL Server"}, {"id": "opensearch", "title": "OpenSearch requirements", "ar": "متطلبات OpenSearch"}, {"id": "oracle", "title": "Oracle requirements", "ar": "متطلبات Oracle"}, {"id": "postgresql", "title": "PostgreSQL requirements", "ar": "متطلبات PostgreSQL"}, {"id": "sap-hana", "title": "SAP HANA requirements", "ar": "متطلبات SAP HANA"}, {"id": "teradata", "title": "Teradata Vantage requirements", "ar": "متطلبات Teradata"}, {"id": "databases-in-cloud", "title": "Databases in the cloud", "ar": "الـ databases على الـ cloud"}]}];
 var $ = function(s,r){return (r||document).querySelector(s)};
 var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var flat = [];
